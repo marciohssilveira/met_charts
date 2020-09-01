@@ -4,13 +4,22 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-import metpy.calc as mpcalc
-from metpy.calc import dewpoint_from_relative_humidity
 import numpy as np
 from cftime import num2pydate
-from metpy.units import units
 from siphon.catalog import TDSCatalog
 from thermodynamic_indices import Indices
+from get_data_gfs import GFS
+
+URL = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
+dataset = 'Latest Collection for GFS Quarter Degree Forecast'
+variables = ['Relative_humidity_isobaric',
+             'Temperature_isobaric',
+             'Geopotential_height_isobaric',
+             'Convective_available_potential_energy_surface',
+             'u-component_of_wind_isobaric',
+             'v-component_of_wind_isobaric']
+
+data = GFS(variables).get_data()
 
 
 def find_time_var(var, time_basename='time'):
@@ -20,26 +29,6 @@ def find_time_var(var, time_basename='time'):
             return coord_name
     raise ValueError('No time variable found for ' + var.name)
 
-
-dt = datetime.utcnow()
-
-# Assemble our URL to the THREDDS Data Server catalog,
-# and access our desired dataset within via NCSS
-base_url = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
-cat = TDSCatalog(base_url)
-ncss = cat.datasets['Latest Collection for GFS Quarter Degree Forecast'].subset()
-
-# Create NCSS query for our desired time, region, and data variables
-query = ncss.query()
-
-query.time(dt)
-query.lonlat_box(north=0, south=-60, east=-30, west=-80)
-query.accept('netcdf')
-query.variables('Relative_humidity_isobaric',
-                'Temperature_isobaric')
-
-# Obtain the queried data
-data = ncss.get_data(query)
 
 temp_var = data.variables['Temperature_isobaric']
 time_var = data.variables[find_time_var(temp_var)]
@@ -56,12 +45,14 @@ lon_2d, lat_2d = np.meshgrid(lon, lat)
 time = num2pydate(time_var[:].squeeze(), time_var.units)
 
 
+cape = data.variables['Convective_available_potential_energy_surface'][:].squeeze()
+
 # Instantiate the indices class containing
 # all the functions to calculate the thermodynamic indexes
 indices = Indices(data)
 
 kindx = indices.k_index()
-ttindx = indices.tt_index()
+# ttindx = indices.tt_index()
 
 
 def plotMap():
@@ -71,7 +62,8 @@ def plotMap():
     fig, ax = plt.subplots(subplot_kw=dict(projection=proj), figsize=(10, 12))
 
     # Zoom in
-    ax.set_extent([-30., -80., 0., -60.])
+
+    ax.set_extent([-35., -60., -5., -30.])
 
     # Add state/country boundaries to plot
     states_provinces = cfeature.NaturalEarthFeature(
@@ -96,17 +88,24 @@ gs = gridspec.GridSpec(2, 1, height_ratios=[1, .02], bottom=.07, top=.99,
 
 plt.title(f'K Index for {time:%d %B %Y %H:%MZ}', fontsize=16)
 
+cape_min = int(cape.min())
+cape_max = int(cape.max())
 # Plot Colorfill of k-index
-cint = np.arange(20, 50)
-k = ax.contourf(lon_2d, lat_2d, kindx, levels=cint[cint > 00],
-                 extend='max', cmap='Reds', transform=ccrs.PlateCarree())
+cint = np.arange(cape_min, cape_max)
+c = ax.contourf(lon_2d, lat_2d, kindx, levels=cint[cint > 30],
+                 extend='max', cmap='Blues', transform=ccrs.PlateCarree())
 
-tt = ax.contourf(lon_2d, lat_2d, ttindx, levels=cint[cint > 00],
+k_min = int(kindx.magnitude.min())
+k_max = int(kindx.magnitude.max())
+# Plot Colorfill of k-index
+cint = np.arange(k_min, k_max)
+k = ax.contourf(lon_2d, lat_2d, kindx, levels=cint[cint > 20],
                  extend='max', cmap='Reds', transform=ccrs.PlateCarree())
 
 cax = plt.subplot(gs[1])
 cb = plt.colorbar(k, cax=cax, orientation='horizontal', extendrect=True, ticks=cint)
 cb.set_label(r'$^{o}C$', size='large')
+
 
 plt.savefig('kindx.png')
 plt.show()

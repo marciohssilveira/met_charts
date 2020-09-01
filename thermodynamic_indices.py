@@ -1,5 +1,5 @@
 import metpy.calc as mpcalc
-from metpy.calc import dewpoint_from_relative_humidity
+from metpy.calc import dewpoint_from_relative_humidity, cape_cin
 import numpy as np
 from metpy.units import units
 
@@ -42,24 +42,4 @@ class Indices:
 
         return kindx
 
-    def tt_index(self):
-        # Convert number of hours since the reference time into an actual date
-        # time = num2pydate(time_var[:].squeeze(), time_var.units)
-
-        lev_850 = np.where(self.data.variables['isobaric'][:] == 850 * 100)[0][0]
-        relh_850 = self.relh[lev_850]
-        temp_850 = self.temp[lev_850]
-        dewp_850 = dewpoint_from_relative_humidity(temp_850, relh_850)
-
-        lev_500 = np.where(self.data.variables['isobaric'][:] == 500 * 100)[0][0]
-        temp_500 = self.temp[lev_500]
-
-        # Calculate K-index
-        sum1 = temp_850 + dewp_850
-        sum2 = temp_500 * 2
-        ttindx = sum1 - sum2
-
-        # Smooth the data
-        ttindx = mpcalc.smooth_gaussian(ttindx, 2)
-
-        return ttindx
+    # def cape(self):
