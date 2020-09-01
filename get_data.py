@@ -6,6 +6,7 @@ from siphon.catalog import TDSCatalog
 from netCDF4 import Dataset
 
 
+
 class GFS:
 
     def __init__(self, variables):

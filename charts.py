@@ -6,10 +6,14 @@ import metpy.calc as mpcalc
 import numpy as np
 from cftime import num2pydate
 from metpy.units import units
+from indices import Indices
+
 
 class Charts:
     def __init__(self, data):
         self.data = data
+        self.indices = Indices(self.data)
+        self.k = self.indices.k_index()
 
     def clouds_humidity(self):
         """
@@ -26,6 +30,7 @@ class Charts:
         LIFT (blue contour)
         300hPa geopotential height (black contour)
         """
+        
 
     def rain(self):
         """
@@ -70,13 +75,12 @@ class Charts:
 
     def temperature_advection(self):
         # Pull out variables you want to use
-        hght_var = data.variables['Geopotential_height_isobaric']
-        temp_var = data.variables['Temperature_isobaric']
-        u_wind_var = data.variables['u-component_of_wind_isobaric']
-        v_wind_var = data.variables['v-component_of_wind_isobaric']
-        time_var = data.variables[find_time_var(temp_var)]
-        lat_var = data.variables['lat']
-        lon_var = data.variables['lon']
+        hght_var = self.data.variables['Geopotential_height_isobaric']
+        temp_var = self.data.variables['Temperature_isobaric']
+        u_wind_var = self.data.variables['u-component_of_wind_isobaric']
+        v_wind_var = self.data.variables['v-component_of_wind_isobaric']
+        lat_var = self.data.variables['lat']
+        lon_var = self.data.variables['lon']
 
         # Get actual data values and remove any size 1 dimensions
         lat = lat_var[:].squeeze()
@@ -86,10 +90,7 @@ class Charts:
         u_wind = units.Quantity(u_wind_var[:].squeeze(), u_wind_var.units)
         v_wind = units.Quantity(v_wind_var[:].squeeze(), v_wind_var.units)
 
-        # Convert number of hours since the reference time into an actual date
-        time = num2pydate(time_var[:].squeeze(), time_var.units)
-
-        lev_850 = np.where(data.variables['isobaric'][:] == 850 * 100)[0][0]
+        lev_850 = np.where(self.data.variables['isobaric'][:] == 850 * 100)[0][0]
         hght_850 = hght[lev_850]
         temp_850 = temp[lev_850]
         u_wind_850 = u_wind[lev_850]
@@ -136,7 +137,7 @@ class Charts:
 
         # Add the map and set the extent
         ax = plt.subplot(gs[0], projection=plotcrs)
-        plt.title(f'850mb Temperature Advection for {time:%d %B %Y %H:%MZ}', fontsize=16)
+        # plt.title(f'850mb Temperature Advection for {time:%d %B %Y %H:%MZ}', fontsize=16)
         ax.set_extent([-30., -80., 0., -50.])
 
         # Plot Height Contours

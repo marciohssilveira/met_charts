@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from cftime import num2pydate
 from siphon.catalog import TDSCatalog
-from thermodynamic_indices import Indices
-from get_data_gfs import GFS
+from indices import Indices
+from get_data import GFS
 
 URL = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
 dataset = 'Latest Collection for GFS Quarter Degree Forecast'
