@@ -4,16 +4,19 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import metpy.calc as mpcalc
 import numpy as np
-from cftime import num2pydate
 from metpy.units import units
-from indices import Indices
+
+import indices
 
 
-class Charts:
+class CalculateCharts:
     def __init__(self, data):
         self.data = data
-        self.indices = Indices(self.data)
-        self.k = self.indices.k_index()
+        calculate_indices = indices.CalculateIndices(self.data)
+        self.k = calculate_indices.k()
+        self.tt = calculate_indices.tt()
+        self.li = calculate_indices.li()
+        self.sweat = calculate_indices.sweat()
 
     def clouds_humidity(self):
         """
@@ -30,7 +33,6 @@ class Charts:
         LIFT (blue contour)
         300hPa geopotential height (black contour)
         """
-        
 
     def rain(self):
         """

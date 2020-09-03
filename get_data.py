@@ -1,13 +1,9 @@
 import datetime as dt
-import pandas as pd
-import metpy.calc as mpcalc
-from metpy.units import pandas_dataframe_to_unit_arrays
+
 from siphon.catalog import TDSCatalog
-from netCDF4 import Dataset
 
 
-
-class GFS:
+class GetGFSData:
 
     def __init__(self, variables):
         self.variables = variables
@@ -58,37 +54,5 @@ class GFS:
         ###########################################
         # We now request data from the server using this query.
         print(f'Downloading data...')
-        raw_data = gfs_subset.download(query)
+        raw_data = gfs_subset.get_data(query)
         return raw_data
-
-    # The variables are then stored in a NetCDF4 dataset
-    # print(gfs.variables.keys())
-    #
-    # def adjust_data(self, data_with_variables):
-    #     """
-    #     :param data_with_variables: receives the dataframe containing the data and adjust the units
-    #     :return: the updated dataframe
-    #     """
-    #     # converts temperature from Kelvin to Degrees Celsius
-    #     data_with_variables['Temperature_isobaric'] = data_with_variables['Temperature_isobaric'].apply(
-    #         lambda x: x - 273.015)
-    #
-    #     # converts pressure from Pa to hPa
-    #     data_with_variables['pressure'] = data_with_variables['pressure'].apply(lambda x: x / 100)
-    #
-    #     # dictionary with the units used to apply into the mpcalc function
-    #     # the package metpy functions will only deal with data with its units associated
-    #     variables_list = data_with_variables.columns
-    #     variables_units_dict = dict(zip(variables_list, self.units))
-    #
-    #     # Attach units to data into the dataframe and return united arrays
-    #     data_with_variables = pandas_dataframe_to_unit_arrays(data_with_variables, variables_units_dict)
-    #
-    #     # Calculate the ambient dewpoint given air temperature and relative humidity.
-    #     data_with_variables['Dewpoint'] = mpcalc.dewpoint_from_relative_humidity(
-    #         data_with_variables['Temperature_isobaric'],
-    #         data_with_variables['Relative_humidity_isobaric'])
-    #
-    #     # converto to pandas dataframe again as the plt_skew() metpy function suggests
-    #     adjusted_data = pd.DataFrame(data_with_variables)
-    #     return adjusted_data
