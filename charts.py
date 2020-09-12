@@ -24,7 +24,38 @@ class CalculateCharts:
         UR > 70% average (1000, 850) (green countour)
         Wind > 5m/s (arrows)
         1000-500mb thickness (red contour)
+        Sea level pressure (black contour)
         """
+        # Obtain pressure levels (Temperature data has more vertical levels, so lets filter)
+        pressure_var = self.data.variables['isobaric']
+        pressure = units.Quantity(pressure_var[:].squeeze(), 'Pa')
+        index_pressure = [int(index) for index, value in enumerate(pressure)]
+
+        # Pull out variables
+        rhum_var = self.data.variables['Relative_humidity_isobaric'][0][index_pressure]
+        uwnd_var = self.data.variables['u-component_of_wind_isobaric'][0][index_pressure]
+        vwnd_var = self.data.variables['v-component_of_wind_isobaric'][0][index_pressure]
+
+        # Get actual data values and assigning units
+        rhum = units.Quantity(rhum_var[:].squeeze(), 'percent')
+        uwnd = units.Quantity(uwnd_var[:].squeeze(), 'knots')
+        vwnd = units.Quantity(vwnd_var[:].squeeze(), 'knots')
+        wind_spd = mpcalc.wind_speed(uwnd, vwnd)
+        wind_dir = mpcalc.wind_direction(uwnd, vwnd)
+
+        # Obtaining useful levels indexes
+        lev_850 = np.where(self.data.variables['isobaric'][:] == 850 * 100)[0][0]
+        lev_700 = np.where(self.data.variables['isobaric'][:] == 700 * 100)[0][0]
+        lev_500 = np.where(self.data.variables['isobaric'][:] == 500 * 100)[0][0]
+
+        # Filter the data indexing per level and make them available throughout the Class
+        rhum_850 = rhum[lev_850]
+        wind_spd_850 = wind_spd[lev_850]
+        wind_dir_850 = wind_dir[lev_850]
+
+        rhum_700 = rhum[lev_700]
+
+        rhum_500 = rhum[lev_500]
 
     def showers_heat_humidity(self):
         """
