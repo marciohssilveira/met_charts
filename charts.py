@@ -39,6 +39,23 @@ class CalculateCharts:
         ax = plt.subplot(gs[0], projection=plotcrs)
         # plt.title(f'850mb Temperature Advection for {time:%d %B %Y %H:%MZ}', fontsize=16)
         ax.set_extent([-30., -80., 0., -50.])
+        # Add state/country boundaries to plot
+        states_provinces = cfeature.NaturalEarthFeature(
+            category='cultural',
+            name='admin_1_states_provinces_lines',
+            scale='50m',
+            facecolor='none')
+
+        SOURCE = 'Natural Earth'
+        LICENSE = 'public domain'
+
+        ax.add_feature(cfeature.LAND)
+        ax.add_feature(cfeature.COASTLINE)
+        ax.add_feature(cfeature.BORDERS)
+        ax.add_feature(states_provinces, edgecolor='gray')
+        ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
+
+        return fig, ax
 
     def clouds_humidity(self):
         """
@@ -49,7 +66,7 @@ class CalculateCharts:
         Sea level pressure (black contour)
         """
         # Create figure/map
-        self.create_map()
+        fig, ax = self.create_map()
 
         # UR > 70% average(850, 700, 500) (blue contourf)
         rhum_850 = self.variables.relative_humidity(850)
@@ -59,14 +76,16 @@ class CalculateCharts:
             rhum_850.values + rhum_700.values + rhum_500.values) / 3
         # Create plot
         ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
-                    cmap='Blues', transform=ccrs.PlateCarree())
+                    cmap='Blues', transform=ccrs.PlateCarree(),
+                    alpha=0.5)
 
         # UR > 70% average (1000, 850) (green countour)
         rhum_1000 = self.variables.relative_humidity(1000)
         rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
         # Create plot
         ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
-                    cmap='Greens', transform=ccrs.PlateCarree())
+                    cmap='Greens', transform=ccrs.PlateCarree(),
+                    alpha=0.5)
 
         # Wind > 5m/s (arrows)
         # 1000-500mb thickness (red contour)
@@ -213,21 +232,21 @@ class CalculateCharts:
     #     cb = plt.colorbar(cf, cax=cax, orientation='horizontal', extendrect=True, ticks=cint)
     #     cb.set_label(r'$^{o}C/3h$', size='large')
 
-    #     # Add state/country boundaries to plot
-    #     states_provinces = cfeature.NaturalEarthFeature(
-    #         category='cultural',
-    #         name='admin_1_states_provinces_lines',
-    #         scale='50m',
-    #         facecolor='none')
+        # # Add state/country boundaries to plot
+        # states_provinces = cfeature.NaturalEarthFeature(
+        #     category='cultural',
+        #     name='admin_1_states_provinces_lines',
+        #     scale='50m',
+        #     facecolor='none')
 
-    #     SOURCE = 'Natural Earth'
-    #     LICENSE = 'public domain'
+        # SOURCE = 'Natural Earth'
+        # LICENSE = 'public domain'
 
-    #     ax.add_feature(cfeature.LAND)
-    #     ax.add_feature(cfeature.COASTLINE)
-    #     ax.add_feature(cfeature.BORDERS)
-    #     ax.add_feature(states_provinces, edgecolor='gray')
-    #     ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
+        # ax.add_feature(cfeature.LAND)
+        # ax.add_feature(cfeature.COASTLINE)
+        # ax.add_feature(cfeature.BORDERS)
+        # ax.add_feature(states_provinces, edgecolor='gray')
+        # ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
 
     #     # Plot Wind Barbs
     #     ax.barbs(lon_2d, lat_2d, u_wind_850.magnitude, v_wind_850.magnitude,
