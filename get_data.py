@@ -1,6 +1,9 @@
 import datetime as dt
+import time
 
+import xarray as xr
 from siphon.catalog import TDSCatalog
+from xarray.backends import NetCDF4DataStore
 
 
 class GetGFSData:
@@ -38,7 +41,7 @@ class GetGFSData:
         # lonlat_box(west, east, south, north)
         query.lonlat_box(north=0, south=-60, east=-30, west=-80)
         now = dt.datetime.utcnow()
-        n_hours = 30
+        n_hours = 6
         query.time_range(now, now + dt.timedelta(hours=n_hours))
         query.accept('netcdf4')
 
@@ -53,6 +56,14 @@ class GetGFSData:
 
         ###########################################
         # We now request data from the server using this query.
-        print(f'Downloading data...')
+        print('Downloading data...')
+        start_time = time.time()
+
         raw_data = gfs_subset.get_data(query)
-        return raw_data
+
+        elapsed_time = time.time() - start_time
+        print(f'Process done in {elapsed_time} seconds')
+
+        # We need the datastore so that we can open the existing netcdf dataset we downloaded
+        dataset = xr.open_dataset(NetCDF4DataStore(raw_data))        
+        return dataset
