@@ -13,7 +13,7 @@ class GetGFSData:
         self.URL = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
         self.dataset = 'Latest Collection for GFS Quarter Degree Forecast'
 
-    def get_data(self):
+    def get(self):
         """
         :param coordinates: tuple like (lon, lat)
         :param variables: chosen list of variables based on the variables list for the dataset
@@ -65,5 +65,5 @@ class GetGFSData:
         print(f'Process done in {elapsed_time} seconds')
 
         # We need the datastore so that we can open the existing netcdf dataset we downloaded
-        dataset = xr.open_dataset(NetCDF4DataStore(raw_data))        
+        dataset = xr.open_dataset(NetCDF4DataStore(raw_data))
         return dataset

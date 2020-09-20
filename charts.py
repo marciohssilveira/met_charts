@@ -6,29 +6,19 @@ import metpy.calc as mpcalc
 import numpy as np
 from metpy.units import units
 
-import indices
+from indices import CalculateIndices
+from variables import ExtractVariables
 
 
 class CalculateCharts:
     def __init__(self, data):
         self.data = data
-        calculate_indices = indices.CalculateIndices(self.data)
-        self.k = calculate_indices.k()
-        self.tt = calculate_indices.tt()
-        self.li = calculate_indices.li()
-        self.sweat = calculate_indices.sweat()
+        # Instantiate ExtractVariables class with the data
+        self.variables = ExtractVariables(self.data)
 
-        
-        
-        # Extract coordinates
-        lat_var = self.data.variables['lat']
-        lon_var = self.data.variables['lon']
+        # Obtain coordinates
+        self.lon_2d, self.lat_2d = self.variables.coordinates()
 
-        # Get actual data values and remove any size 1 dimensions
-        lat = lat_var[:].squeeze()
-        lon = lon_var[:].squeeze()
-        self.lon_2d, self.lat_2d = np.meshgrid(lon, lat)
-    
     def create_map(self):
         # Set Projection of Plot
         plotcrs = ccrs.cartopy.crs.Mercator(central_longitude=0.0,
@@ -50,8 +40,6 @@ class CalculateCharts:
         # plt.title(f'850mb Temperature Advection for {time:%d %B %Y %H:%MZ}', fontsize=16)
         ax.set_extent([-30., -80., 0., -50.])
 
-        return fig
-
     def clouds_humidity(self):
         """
         UR > 70% average(850, 700, 500) (blue contourf)
@@ -61,14 +49,25 @@ class CalculateCharts:
         Sea level pressure (black contour)
         """
         # Create figure/map
-        fig, ax = self.create_map()
-
+        self.create_map()
 
         # UR > 70% average(850, 700, 500) (blue contourf)
-        rhum_850_700_500 = (rhum_850 + rhum_700 + rhum_500) / 3
-        ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500, cmap='Blues', transform=ccrs.PlateCarree())
+        rhum_850 = self.variables.relative_humidity(850)
+        rhum_700 = self.variables.relative_humidity(700)
+        rhum_500 = self.variables.relative_humidity(500)
+        rhum_850_700_500 = (
+            rhum_850.values + rhum_700.values + rhum_500.values) / 3
+        # Create plot
+        ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
+                    cmap='Blues', transform=ccrs.PlateCarree())
 
         # UR > 70% average (1000, 850) (green countour)
+        rhum_1000 = self.variables.relative_humidity(1000)
+        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
+        # Create plot
+        ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
+                    cmap='Greens', transform=ccrs.PlateCarree())
+
         # Wind > 5m/s (arrows)
         # 1000-500mb thickness (red contour)
         # Sea level pressure (black contour)
