@@ -16,6 +16,61 @@ class CalculateCharts:
         self.variables = ExtractVariables(self.data)
         self.indices = CalculateIndices(self.data)
 
+        self.area_1 = {'SBSR': (-20.816111, -49.404722),
+                       'SBAU': (-21.144167, -50.426389),
+                       'SBAQ': (-21.804444, -48.140278),
+                       'SBRP': (-21.136389, -47.776667),
+                       'SBAX': (-19.560556, -46.965556),
+                       'SBUL': (-18.883611, -48.225278),
+                       'SBUR': (-19.764722, -47.966111),
+                       'SBVG': (-21.588889, -45.473333),
+                       'SBZM': (-21.513056, -43.173056),
+                       'SBBH': (-19.851944, -43.950556),
+                       'SBCF': (-19.624444, -43.971944),
+                       'SBMK': (-16.706111, -43.821944),
+                       'SBIP': (-19.470556, -42.488056),
+                       'SBGV': (-18.896944, -41.986111),
+                       'SBBR': (-15.871111, -47.918611),
+                       'SBGO': (-16.632500, -49.221111),
+                       'SBCN': (-17.724722, -48.610000),
+                       'SWLC': (-17.834722, -50.956111),
+                       'SBBW': (-15.860833, -52.389444),
+                       'SNBR': (-12.079167, -45.009444),
+                       'SBLE': (-12.482222, -41.276944),
+                       'SBVC': (-14.907778, -40.914722),
+                       'SNVB': (-13.296389, -38.992500),
+                       'SDIY': (-12.200556, -38.900556),
+                       'SBSV': (-12.908611, -38.322500),
+                       'SBIL': (-14.815000, -39.033333),
+                       'SNTF': (-17.524444, -39.668333)}
+
+        self.area_2 = {'SBGR': (-23.435556, -46.473056),
+                       'SBMT': (-23.506667, -46.633889),
+                       'SBSP': (-23.626111, -46.656389),
+                       'SBSJ': (-23.228889, -45.871111),
+                       'SBTA': (-23.038889, -45.515833),
+                       'SBST': (-23.928056, -46.299722),
+                       'SBKP': (-23.006944, -47.134444),
+                       'SBJD': (-23.181667, -46.943611),
+                       'SBBP': (-22.979167, -46.537500),
+                       'SBJH': (-23.426944, -47.165833),
+                       'SDCO': (-23.483056, -47.486389),
+                       'SBBU': (-22.343611, -49.053889),
+                       'SBAE': (-22.157778, -49.068333),
+                       'SBML': (-22.195556, -49.926944),
+                       'SBDN': (-22.178333, -51.418889),
+                       'SBCR': (-19.011944, -57.671389),
+                       'SBCG': (-20.469444, -54.670278),
+                       'SBTG': (-20.751389, -51.680278),
+                       'SBDB': (-21.247222, -56.452500),
+                       'SBDO': (-22.200556, -54.925556),
+                       'SBPP': (-22.549722, -55.703056),
+                       'SBLO': (-23.330278, -51.136667),
+                       'SBMG': (-23.479444, -52.012222),
+                       'SBTD': (-24.685278, -53.696389),
+                       'SBCA': (-25.002222, -53.501944),
+                       'SSGG': (-25.388333, -51.523611),
+                       'SBPO': (-26.217222, -52.694444)}
         # Obtain coordinates
         self.lon_2d, self.lat_2d = self.variables.coordinates()
 
@@ -38,7 +93,7 @@ class CalculateCharts:
         # Add the map and set the extent
         ax = plt.subplot(gs[0], projection=plotcrs)
 
-        ax.set_extent([-30., -80., 0., -50.])
+        ax.set_extent([-35., -60., -10., -30.])
         # Add state/country boundaries to plot
         states_provinces = cfeature.NaturalEarthFeature(
             category='cultural',
@@ -52,6 +107,16 @@ class CalculateCharts:
         ax.gridlines(draw_labels=True, dms=True,
                      x_inline=False, y_inline=False)
 
+        # Plot area_1 airports:
+        lons_1 = [x[-1] for x in self.area_1.values()]
+        lats_1 = [y[0] for y in self.area_1.values()]
+        ax.scatter(lons_1, lats_1, transform=ccrs.PlateCarree(), marker="*", c='mediumblue')
+
+        # Plot area_2 airports:
+        lons_2 = [x[-1] for x in self.area_2.values()]
+        lats_2 = [y[0] for y in self.area_2.values()]
+        ax.scatter(lons_2, lats_2, transform=ccrs.PlateCarree(), marker="*", c='indigo')
+
         return fig, ax
 
     def clouds_humidity(self):
@@ -62,6 +127,7 @@ class CalculateCharts:
         1000-500mb thickness (red contour)
         Sea level pressure (black contour)
         """
+        print('processing')
         # Create figure/map
         fig, ax = self.create_map()
 
@@ -87,11 +153,11 @@ class CalculateCharts:
                     alpha=0.3, levels=cint[cint > 70], extend='max')
 
         # Wind > 5m/s (arrows)
-        uwnd_850, vwnd_850 = self.variables.wind_components(850)
-        # Create plot
-        ax.barbs(self.lon_2d, self.lat_2d, np.array(uwnd_850), np.array(vwnd_850),
-                 length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree(),
-                 barbcolor='gray')
+        # uwnd_850, vwnd_850 = self.variables.wind_components(850)
+        # # Create plot
+        # ax.barbs(self.lon_2d, self.lat_2d, np.array(uwnd_850), np.array(vwnd_850),
+        #          length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree(),
+        #          barbcolor='gray')
 
         # 1000-500mb thickness (red contour)
         hgpt_1000 = self.variables.geopotential_height(1000)
@@ -101,17 +167,16 @@ class CalculateCharts:
         cint = np.arange(hgpt_1000_500.min(), hgpt_1000_500.max(),
                          (hgpt_1000_500.max() - hgpt_1000_500.min()) / 10)
         cs = ax.contour(self.lon_2d, self.lat_2d, hgpt_1000_500, colors='red',
-                   transform=ccrs.PlateCarree(), levels=cint, alpha=0.6)
+                        transform=ccrs.PlateCarree(), levels=cint, alpha=0.6)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
 
         # Sea level pressure (black contour)
         mslp = self.variables.mean_sea_level_pressure()
         # Create plot
-        cint = np.arange(mslp.min(), mslp.max())
+        cint = np.linspace(mslp.min(), mslp.max())
         cs = ax.contour(self.lon_2d, self.lat_2d, mslp, colors='black',
-                   transform=ccrs.PlateCarree(), alpha=0.6)
+                        transform=ccrs.PlateCarree(), alpha=0.6)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
-        print('processing')
         ax.set_title('Umidade e/ou nebulosidade', fontsize=16, ha='center')
         return fig
 
@@ -131,13 +196,6 @@ class CalculateCharts:
         condition = (k_index > 30) & (tt_index > 45)
         k_30_tt_45 = (k_index * condition) + (tt_index * condition)
         # Create plot
-
-        #####
-
-# NEXT: THINK OF LEVELS AND COLOR INTERVALS
-
-        #####
-
         ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
                     cmap='Greens', transform=ccrs.PlateCarree(),
                     alpha=0.5)
