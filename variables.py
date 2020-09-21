@@ -113,6 +113,6 @@ class ExtractVariables:
         Extract values of mean sea level pressure.
         In return you will have a xarray.Dataset for the desired time and level.
         """
-        mslp = self.data["Pressure_reduced_to_MSL_msl"][self.time_step] * 100
-        mslp.attrs["units"] = "Pa"
+        mslp = self.data["Pressure_reduced_to_MSL_msl"][self.time_step] / 100
+        mslp.attrs["units"] = "hPa"
         return mslp

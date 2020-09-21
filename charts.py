@@ -46,7 +46,6 @@ class CalculateCharts:
             scale='50m',
             facecolor='none')
 
-        ax.add_feature(cfeature.LAND)
         ax.add_feature(cfeature.COASTLINE)
         ax.add_feature(cfeature.BORDERS)
         ax.add_feature(states_provinces, edgecolor='gray')
@@ -66,44 +65,52 @@ class CalculateCharts:
         # Create figure/map
         fig, ax = self.create_map()
 
-        # UR > 70% average(850, 700, 500) (blue contourf)
+        # UR > 70% average (1000, 850) (green countour)
+        rhum_1000 = self.variables.relative_humidity(1000)
         rhum_850 = self.variables.relative_humidity(850)
+        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
+        # Create plot
+        cint = np.arange(rhum_1000_850.min(), rhum_1000_850.max(), 10)
+        ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
+                    cmap='Greens', transform=ccrs.PlateCarree(),
+                    alpha=0.3, levels=cint[cint > 70], extend='max')
+
+        # UR > 70% average(850, 700, 500) (blue contourf)
         rhum_700 = self.variables.relative_humidity(700)
         rhum_500 = self.variables.relative_humidity(500)
         rhum_850_700_500 = (
             rhum_850.values + rhum_700.values + rhum_500.values) / 3
         # Create plot
+        cint = np.arange(rhum_850_700_500.min(), rhum_850_700_500.max(), 10)
         ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
                     cmap='Blues', transform=ccrs.PlateCarree(),
-                    alpha=0.5, vmin=70)
-
-        # UR > 70% average (1000, 850) (green countour)
-        rhum_1000 = self.variables.relative_humidity(1000)
-        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
-        # Create plot
-        ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
-                    cmap='Greens', transform=ccrs.PlateCarree(),
-                    alpha=0.5, vmin=70)
+                    alpha=0.3, levels=cint[cint > 70], extend='max')
 
         # Wind > 5m/s (arrows)
         uwnd_850, vwnd_850 = self.variables.wind_components(850)
         # Create plot
         ax.barbs(self.lon_2d, self.lat_2d, np.array(uwnd_850), np.array(vwnd_850),
-                 length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree())
+                 length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree(),
+                 barbcolor='gray')
 
         # 1000-500mb thickness (red contour)
         hgpt_1000 = self.variables.geopotential_height(1000)
         hgpt_500 = self.variables.geopotential_height(500)
         hgpt_1000_500 = hgpt_500.values - hgpt_1000.values
         # Create plot
-        ax.contour(self.lon_2d, self.lat_2d, hgpt_1000_500, colors='red',
-                   transform=ccrs.PlateCarree())
+        cint = np.arange(hgpt_1000_500.min(), hgpt_1000_500.max(),
+                         (hgpt_1000_500.max() - hgpt_1000_500.min()) / 10)
+        cs = ax.contour(self.lon_2d, self.lat_2d, hgpt_1000_500, colors='red',
+                   transform=ccrs.PlateCarree(), levels=cint, alpha=0.6)
+        ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
 
         # Sea level pressure (black contour)
         mslp = self.variables.mean_sea_level_pressure()
         # Create plot
-        ax.contour(self.lon_2d, self.lat_2d, mslp, colors='black',
-                   transform=ccrs.PlateCarree())
+        cint = np.arange(mslp.min(), mslp.max())
+        cs = ax.contour(self.lon_2d, self.lat_2d, mslp, colors='black',
+                   transform=ccrs.PlateCarree(), alpha=0.6)
+        ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
         print('processing')
         ax.set_title('Umidade e/ou nebulosidade', fontsize=16, ha='center')
         return fig
@@ -125,14 +132,11 @@ class CalculateCharts:
         k_30_tt_45 = (k_index * condition) + (tt_index * condition)
         # Create plot
 
-
         #####
 
 # NEXT: THINK OF LEVELS AND COLOR INTERVALS
 
         #####
-
-
 
         ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
                     cmap='Greens', transform=ccrs.PlateCarree(),
