@@ -81,3 +81,38 @@ class ExtractVariables:
         wind_spd = mpcalc.wind_speed(uwnd, vwnd)
         wind_dir = mpcalc.wind_direction(uwnd, vwnd)
         return wind_dir, wind_spd
+
+    def wind_components(self, level):
+        """
+        Receives the integer value of the desired vertical pressure level
+        to extract from data a tuple containing u and v components of wind.
+        In return you will have a xarray.Dataset for the desired time and level.
+        """
+        # Obtaining the index for the given pressure level
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
+        uwnd = self.data["u-component_of_wind_isobaric"][self.time_step][index_level]
+        vwnd = self.data["v-component_of_wind_isobaric"][self.time_step][index_level]
+        return uwnd, vwnd
+
+    def geopotential_height(self, level):
+        """
+        Receives the integer value of the desired vertical pressure level
+        to extract from data the geopotential values in gpm.
+        In return you will have a xarray.Dataset for the desired time and level.
+        """
+        # Obtaining the index for the given pressure level
+        index_level = np.where(
+            np.array(self.data["isobaric6"]) == level * 100)[0][0]
+        hgpt = self.data["Geopotential_height_isobaric"][self.time_step][index_level]
+        hgpt.attrs["units"] = "gpm"
+        return hgpt
+
+    def mean_sea_level_pressure(self):
+        """
+        Extract values of mean sea level pressure.
+        In return you will have a xarray.Dataset for the desired time and level.
+        """
+        mslp = self.data["Pressure_reduced_to_MSL_msl"][self.time_step] * 100
+        mslp.attrs["units"] = "Pa"
+        return mslp

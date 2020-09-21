@@ -13,8 +13,8 @@ from variables import ExtractVariables
 class CalculateCharts:
     def __init__(self, data):
         self.data = data
-        # Instantiate ExtractVariables class with the data
         self.variables = ExtractVariables(self.data)
+        self.indices = CalculateIndices(self.data)
 
         # Obtain coordinates
         self.lon_2d, self.lat_2d = self.variables.coordinates()
@@ -37,7 +37,7 @@ class CalculateCharts:
 
         # Add the map and set the extent
         ax = plt.subplot(gs[0], projection=plotcrs)
-        # plt.title(f'850mb Temperature Advection for {time:%d %B %Y %H:%MZ}', fontsize=16)
+
         ax.set_extent([-30., -80., 0., -50.])
         # Add state/country boundaries to plot
         states_provinces = cfeature.NaturalEarthFeature(
@@ -46,14 +46,12 @@ class CalculateCharts:
             scale='50m',
             facecolor='none')
 
-        SOURCE = 'Natural Earth'
-        LICENSE = 'public domain'
-
         ax.add_feature(cfeature.LAND)
         ax.add_feature(cfeature.COASTLINE)
         ax.add_feature(cfeature.BORDERS)
         ax.add_feature(states_provinces, edgecolor='gray')
-        ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
+        ax.gridlines(draw_labels=True, dms=True,
+                     x_inline=False, y_inline=False)
 
         return fig, ax
 
@@ -77,7 +75,7 @@ class CalculateCharts:
         # Create plot
         ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
                     cmap='Blues', transform=ccrs.PlateCarree(),
-                    alpha=0.5)
+                    alpha=0.5, vmin=70)
 
         # UR > 70% average (1000, 850) (green countour)
         rhum_1000 = self.variables.relative_humidity(1000)
@@ -85,12 +83,29 @@ class CalculateCharts:
         # Create plot
         ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
                     cmap='Greens', transform=ccrs.PlateCarree(),
-                    alpha=0.5)
+                    alpha=0.5, vmin=70)
 
         # Wind > 5m/s (arrows)
+        uwnd_850, vwnd_850 = self.variables.wind_components(850)
+        # Create plot
+        ax.barbs(self.lon_2d, self.lat_2d, np.array(uwnd_850), np.array(vwnd_850),
+                 length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree())
+
         # 1000-500mb thickness (red contour)
+        hgpt_1000 = self.variables.geopotential_height(1000)
+        hgpt_500 = self.variables.geopotential_height(500)
+        hgpt_1000_500 = hgpt_500.values - hgpt_1000.values
+        # Create plot
+        ax.contour(self.lon_2d, self.lat_2d, hgpt_1000_500, colors='red',
+                   transform=ccrs.PlateCarree())
+
         # Sea level pressure (black contour)
+        mslp = self.variables.mean_sea_level_pressure()
+        # Create plot
+        ax.contour(self.lon_2d, self.lat_2d, mslp, colors='black',
+                   transform=ccrs.PlateCarree())
         print('processing')
+        ax.set_title('Umidade e/ou nebulosidade', fontsize=16, ha='center')
         return fig
 
     def showers_heat_humidity(self):
@@ -100,6 +115,46 @@ class CalculateCharts:
         LIFT (blue contour)
         300hPa geopotential height (black contour)
         """
+        # Create figure/map
+        fig, ax = self.create_map()
+
+        # K > 30 + TTS > 45 (green countourf)
+        k_index = self.indices.k()
+        tt_index = self.indices.tt()
+        condition = (k_index > 30) & (tt_index > 45)
+        k_30_tt_45 = (k_index * condition) + (tt_index * condition)
+        # Create plot
+
+
+        #####
+
+# NEXT: THINK OF LEVELS AND COLOR INTERVALS
+
+        #####
+
+
+
+        ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
+                    cmap='Greens', transform=ccrs.PlateCarree(),
+                    alpha=0.5)
+        # K > 30 + TTS > 45 + LI < -1 (red countourf)
+        li_index = self.indices.li()
+        condition = (k_index > 30) & (tt_index > 45) & (li_index < -1)
+        k_30_tt_45_li_m1 = (k_index * condition) + \
+            (tt_index * condition) + (li_index * condition)
+        ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45_li_m1,
+                    cmap='Reds', transform=ccrs.PlateCarree(),
+                    alpha=0.5)
+        # LIFT (blue contour)
+        ax.contour(self.lon_2d, self.lat_2d, li_index,
+                   colors='blue', transform=ccrs.PlateCarree(),
+                   alpha=0.5)
+        # 300hPa geopotential height (black contour)
+        hgpt_300 = self.variables.geopotential_height(300)
+        ax.contour(self.lon_2d, self.lat_2d, hgpt_300,
+                   colors='black', transform=ccrs.PlateCarree(),
+                   alpha=0.5)
+        return fig
 
     def rain(self):
         """
@@ -248,9 +303,9 @@ class CalculateCharts:
         # ax.add_feature(states_provinces, edgecolor='gray')
         # ax.gridlines(draw_labels=True, dms=True, x_inline=False, y_inline=False)
 
-    #     # Plot Wind Barbs
-    #     ax.barbs(lon_2d, lat_2d, u_wind_850.magnitude, v_wind_850.magnitude,
-    #              length=6, regrid_shape=20, pivot='middle', transform=datacrs)
+        # # Plot Wind Barbs
+        # ax.barbs(lon_2d, lat_2d, u_wind_850.magnitude, v_wind_850.magnitude,
+        #          length=6, regrid_shape=20, pivot='middle', transform=datacrs)
 
     #     plt.savefig('test.png')
     #     plt.show()

@@ -67,3 +67,10 @@ class GetGFSData:
         # We need the datastore so that we can open the existing netcdf dataset we downloaded
         dataset = xr.open_dataset(NetCDF4DataStore(raw_data))
         return dataset
+
+    def save(self):
+        """
+        Takes the result of the get method, which is a xarray.Dataset 
+        and stores it in a local file for debugging purposes
+        """
+        
