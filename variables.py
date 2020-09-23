@@ -7,7 +7,7 @@ import xarray as xr
 class ExtractVariables:
     def __init__(self, data):
         self.data = data
-        self.time_step = 0
+        self.time_step = 1
 
     def coordinates(self):
         """
