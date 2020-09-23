@@ -39,7 +39,7 @@ class GetGFSData:
         # This request will return all vertical levels for a single point and for the time interval.
         # Note the string representation of the query is a properly encoded query string.
         # lonlat_box(west, east, south, north)
-        query.lonlat_box(north=0, south=-60, east=-30, west=-80)
+        query.lonlat_box(north=-10, south=-30, east=-35, west=-60)
         now = dt.datetime.utcnow()
         n_hours = 6
         query.time_range(now, now + dt.timedelta(hours=n_hours))

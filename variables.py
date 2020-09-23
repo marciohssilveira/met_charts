@@ -80,6 +80,13 @@ class ExtractVariables:
         # Calculate wind speed and direction using metpy functions
         wind_spd = mpcalc.wind_speed(uwnd, vwnd)
         wind_dir = mpcalc.wind_direction(uwnd, vwnd)
+        # Convert the results in a numpy array to convert from m/s to knots
+        wind_spd = np.array(wind_spd) * 1.94384
+        # Convert the result of the metpy function into a xarray.Dataset
+        wind_spd = xr.DataArray(wind_spd)
+        wind_spd.attrs["units"] = "knots"
+        wind_dir = xr.DataArray(wind_dir)
+        wind_dir.attrs["units"] = "degrees"
         return wind_dir, wind_spd
 
     def wind_components(self, level):
@@ -116,3 +123,16 @@ class ExtractVariables:
         mslp = self.data["Pressure_reduced_to_MSL_msl"][self.time_step] / 100
         mslp.attrs["units"] = "hPa"
         return mslp
+
+    def omega(self, level):
+        """
+        Receives the integer value of the desired vertical pressure level
+        to extract from data the omega values in Pa/s.
+        In return you will have a xarray.Dataset for the desired time and level.
+        """
+        # Obtaining the index for the given pressure level
+        index_level = np.where(
+            np.array(self.data["isobaric4"]) == level * 100)[0][0]
+        omega = self.data["Vertical_velocity_pressure_isobaric"][self.time_step][index_level]
+        omega.attrs["units"] = "Pa/s"
+        return omega

@@ -38,8 +38,7 @@ class CalculateIndices:
 
     def tt(self):
         # Calculate TT-index
-        tt_index = (self.tair_850.values - self.dewp_850.values) - \
-            (2 * self.tair_500.values)
+        tt_index = (self.tair_850.values + self.dewp_850.values) - (2 * self.tair_500.values)
 
         # Smooth the data
         tt_index = mpcalc.smooth_gaussian(tt_index, 2)

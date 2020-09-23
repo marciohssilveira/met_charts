@@ -87,12 +87,15 @@ class CalculateCharts:
 
         # Create new figure
         fig = plt.figure(figsize=(10, 12))
-        gs = gridspec.GridSpec(2, 1, height_ratios=[1, .02], bottom=.07, top=.99,
-                               hspace=0.01, wspace=0.01)
 
-        # Add the map and set the extent
+        # Control the figures with GridSpec
+        gs = gridspec.GridSpec(
+            nrows=4, ncols=1, height_ratios=[2, .02, .02, .02], bottom=.07, top=.99)
+
+        # Add the map to the top row of the gs grid
         ax = plt.subplot(gs[0], projection=plotcrs)
 
+        # Set the extent
         ax.set_extent([-35., -60., -10., -30.])
         # Add state/country boundaries to plot
         states_provinces = cfeature.NaturalEarthFeature(
@@ -101,8 +104,8 @@ class CalculateCharts:
             scale='50m',
             facecolor='none')
 
-        ax.add_feature(cfeature.COASTLINE)
-        ax.add_feature(cfeature.BORDERS)
+        ax.add_feature(cfeature.COASTLINE, edgecolor='gray')
+        ax.add_feature(cfeature.BORDERS, edgecolor='gray')
         ax.add_feature(states_provinces, edgecolor='gray')
         ax.gridlines(draw_labels=True, dms=True,
                      x_inline=False, y_inline=False)
@@ -110,14 +113,16 @@ class CalculateCharts:
         # Plot area_1 airports:
         lons_1 = [x[-1] for x in self.area_1.values()]
         lats_1 = [y[0] for y in self.area_1.values()]
-        ax.scatter(lons_1, lats_1, transform=ccrs.PlateCarree(), marker="*", c='mediumblue')
+        ax.scatter(lons_1, lats_1, transform=ccrs.PlateCarree(),
+                   marker="*", c='mediumblue', zorder=99)
 
         # Plot area_2 airports:
         lons_2 = [x[-1] for x in self.area_2.values()]
         lats_2 = [y[0] for y in self.area_2.values()]
-        ax.scatter(lons_2, lats_2, transform=ccrs.PlateCarree(), marker="*", c='indigo')
+        ax.scatter(lons_2, lats_2, transform=ccrs.PlateCarree(),
+                   marker="*", c='black', zorder=99)
 
-        return fig, ax
+        return fig, ax, gs
 
     def clouds_humidity(self):
         """
@@ -127,56 +132,85 @@ class CalculateCharts:
         1000-500mb thickness (red contour)
         Sea level pressure (black contour)
         """
-        print('processing')
-        # Create figure/map
-        fig, ax = self.create_map()
-
-        # UR > 70% average (1000, 850) (green countour)
+        # Define variables
         rhum_1000 = self.variables.relative_humidity(1000)
         rhum_850 = self.variables.relative_humidity(850)
-        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
-        # Create plot
-        cint = np.arange(rhum_1000_850.min(), rhum_1000_850.max(), 10)
-        ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
-                    cmap='Greens', transform=ccrs.PlateCarree(),
-                    alpha=0.3, levels=cint[cint > 70], extend='max')
-
-        # UR > 70% average(850, 700, 500) (blue contourf)
         rhum_700 = self.variables.relative_humidity(700)
         rhum_500 = self.variables.relative_humidity(500)
-        rhum_850_700_500 = (
-            rhum_850.values + rhum_700.values + rhum_500.values) / 3
-        # Create plot
-        cint = np.arange(rhum_850_700_500.min(), rhum_850_700_500.max(), 10)
-        ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
-                    cmap='Blues', transform=ccrs.PlateCarree(),
-                    alpha=0.3, levels=cint[cint > 70], extend='max')
-
-        # Wind > 5m/s (arrows)
-        # uwnd_850, vwnd_850 = self.variables.wind_components(850)
-        # # Create plot
-        # ax.barbs(self.lon_2d, self.lat_2d, np.array(uwnd_850), np.array(vwnd_850),
-        #          length=6, regrid_shape=20, pivot='middle', transform=ccrs.PlateCarree(),
-        #          barbcolor='gray')
-
-        # 1000-500mb thickness (red contour)
         hgpt_1000 = self.variables.geopotential_height(1000)
         hgpt_500 = self.variables.geopotential_height(500)
+        mslp = self.variables.mean_sea_level_pressure()
+
+        # Create figure/map/grids
+        fig, ax, gs = self.create_map()
+
+        # UR > 70% average (1000, 850) (green countour)
+        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
+        levels = np.arange(70, 105, 5)  # Relative humidity intervals
+        # Put plot on ax = gs[0] (row 0)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
+                          cmap='Greens', transform=ccrs.PlateCarree(),
+                          alpha=0.5, levels=levels)
+        # Put colorbar on gs[1] (row 1)
+        gs1 = plt.subplot(gs[1])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs1,   # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title('UR > 70% nos níveis 1000/850 hPa', size='small')
+
+        # UR > 70% average(850, 700, 500) (blue contourf)
+        rhum_850_700_500 = (
+            rhum_850.values + rhum_700.values + rhum_500.values) / 3
+        # Put another plot on ax = gs[0] (row 0)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, rhum_850_700_500,
+                          cmap='Blues', transform=ccrs.PlateCarree(),
+                          alpha=0.5, levels=levels)
+        # Put colorbar on gs[2] (row 2)
+        gs2 = plt.subplot(gs[2])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs2,  # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title(
+            'UR > 70% nos níveis 850/700/500 hPa', size='small')
+
+        # Wind > 10kt (barbs)
+        _, wnd_spd_850 = self.variables.wind(850)
+        uwnd_850, vwnd_850 = self.variables.wind_components(850)
+        # Conditions
+        condition = np.array(wnd_spd_850) > 10
+        uwnd_850 = np.array(uwnd_850)
+        vwnd_850 = np.array(vwnd_850)
+        uwnd_850 = uwnd_850 * condition
+        vwnd_850 = vwnd_850 * condition
+        uwnd_850[uwnd_850 == 0] = np.nan
+        vwnd_850[vwnd_850 == 0] = np.nan
+        # Create plot
+        ax.barbs(self.lon_2d, self.lat_2d, uwnd_850, vwnd_850, length=5,
+                 regrid_shape=25, transform=ccrs.PlateCarree(),
+                 barbcolor='midnightblue', barb_increments={'half': 5, 'full': 10, 'flag': 50})
+
+        # 1000-500mb thickness (red contour)
         hgpt_1000_500 = hgpt_500.values - hgpt_1000.values
         # Create plot
-        cint = np.arange(hgpt_1000_500.min(), hgpt_1000_500.max(),
-                         (hgpt_1000_500.max() - hgpt_1000_500.min()) / 10)
+        levels = np.arange(hgpt_1000_500.min(), hgpt_1000_500.max(),
+                           (hgpt_1000_500.max() - hgpt_1000_500.min()) / 10)
         cs = ax.contour(self.lon_2d, self.lat_2d, hgpt_1000_500, colors='red',
-                        transform=ccrs.PlateCarree(), levels=cint, alpha=0.6)
+                        transform=ccrs.PlateCarree(), levels=levels, alpha=0.6)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
 
         # Sea level pressure (black contour)
-        mslp = self.variables.mean_sea_level_pressure()
         # Create plot
-        cint = np.linspace(mslp.min(), mslp.max())
+        levels = np.arange(mslp.min(), mslp.max(),
+                           (mslp.max() - mslp.min()) / 10)
         cs = ax.contour(self.lon_2d, self.lat_2d, mslp, colors='black',
-                        transform=ccrs.PlateCarree(), alpha=0.6)
+                        transform=ccrs.PlateCarree(), alpha=0.6, levels=levels)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
+
+        # Create title
         ax.set_title('Umidade e/ou nebulosidade', fontsize=16, ha='center')
         return fig
 
@@ -187,45 +221,146 @@ class CalculateCharts:
         LIFT (blue contour)
         300hPa geopotential height (black contour)
         """
-        # Create figure/map
-        fig, ax = self.create_map()
-
-        # K > 30 + TTS > 45 (green countourf)
+        # Define variables
         k_index = self.indices.k()
         tt_index = self.indices.tt()
+        li_index = self.indices.li()
+        hgpt_300 = self.variables.geopotential_height(300)
+
+        # Create figure/map
+        fig, ax, gs = self.create_map()
+
+        # K > 30 + TTS > 45 (green countourf)
+        # Define conditions
         condition = (k_index > 30) & (tt_index > 45)
         k_30_tt_45 = (k_index * condition) + (tt_index * condition)
-        # Create plot
-        ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
-                    cmap='Greens', transform=ccrs.PlateCarree(),
-                    alpha=0.5)
-        # K > 30 + TTS > 45 + LI < -1 (red countourf)
-        li_index = self.indices.li()
+        k_30_tt_45[k_30_tt_45 == 0] = np.nan
+        # Put plot on ax = gs[0] (row 0)
+        levels = np.arange(np.nanmin(k_30_tt_45), np.nanmax(k_30_tt_45),
+                           (np.nanmax(k_30_tt_45) - np.nanmin(k_30_tt_45)) / 6)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
+                          Cmap='summer', transform=ccrs.PlateCarree(),
+                          alpha=0.3, levels=levels, extend='max')
+        # Put colorbar on gs[1] (row 1)
+        gs1 = plt.subplot(gs[1])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs1,   # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title(
+            'Combinação de índices: K > 30 + TTS > 45', size='small')
+
+        # # K > 30 + TTS > 45 + LI < -1 (red countourf)
+        # Define conditions
         condition = (k_index > 30) & (tt_index > 45) & (li_index < -1)
         k_30_tt_45_li_m1 = (k_index * condition) + \
             (tt_index * condition) + (li_index * condition)
-        ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45_li_m1,
-                    cmap='Reds', transform=ccrs.PlateCarree(),
-                    alpha=0.5)
+        k_30_tt_45_li_m1[k_30_tt_45_li_m1 == 0] = np.nan
+        # Put another plot on ax = gs[0] (row 0)
+        levels = np.arange(np.nanmin(k_30_tt_45_li_m1), np.nanmax(k_30_tt_45_li_m1),
+                           (np.nanmax(k_30_tt_45_li_m1) - np.nanmin(k_30_tt_45_li_m1)) / 6)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45_li_m1,
+                          cmap='Reds', transform=ccrs.PlateCarree(),
+                          alpha=0.3, levels=levels, extend='max')
+        # Put colorbar on gs[2] (row 2)
+        gs2 = plt.subplot(gs[2])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs2,  # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title(
+            'Combinação de índices: K > 30 + TTS > 45 + LI < -1', size='small')
+
         # LIFT (blue contour)
-        ax.contour(self.lon_2d, self.lat_2d, li_index,
-                   colors='blue', transform=ccrs.PlateCarree(),
-                   alpha=0.5)
+        levels = np.arange(li_index.min(), li_index.max(), 2)
+        # Create plot
+        cs = ax.contour(self.lon_2d, self.lat_2d, li_index,
+                        colors='black', transform=ccrs.PlateCarree(),
+                        levels=levels[levels < 0], linestyles='dashed', alpha=0.6)
+        ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
+
         # 300hPa geopotential height (black contour)
-        hgpt_300 = self.variables.geopotential_height(300)
-        ax.contour(self.lon_2d, self.lat_2d, hgpt_300,
-                   colors='black', transform=ccrs.PlateCarree(),
-                   alpha=0.5)
+        cint = np.arange(hgpt_300.min(), hgpt_300.max(), 50)
+        # Create plot
+        cs = ax.contour(self.lon_2d, self.lat_2d, hgpt_300,
+                        colors='black', transform=ccrs.PlateCarree(),
+                        alpha=0.5, levels=cint)
+        ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
+        ax.set_title('Pancada de chuva com trovoada', fontsize=16, ha='center')
         return fig
 
     def rain(self):
         """
-        OMEGA -0.001 (green contourf)
-        OMEGA -0.01 and UR > 40% average(1000/850) (orange contourf)
-        OMEGA -0.5 and UR > 70% average(1000/850/700/500) (red contourf)
+        OMEGA (500hPa) < -0.001 (green contourf)
+        OMEGA (500hPa) < -0.01 and UR > 40% average(1000/850) (orange contourf)
+        OMEGA (500hPa) < -0.5 and UR > 70% average(1000/850/700/500) (red contourf)
         500hPa geopotential height (black contour)
         500hPa Streamlines (gray streamlines)
         """
+        # Define variables
+        omega_500 = self.variables.omega(500)
+        rhum_1000 = self.variables.relative_humidity(1000)
+        rhum_850 = self.variables.relative_humidity(850)
+        rhum_700 = self.variables.relative_humidity(700)
+        rhum_500 = self.variables.relative_humidity(500)
+        hgpt_500 = self.variables.geopotential_height(500)
+        uwnd_500, vwnd_500 = self.variables.wind_components(500)
+
+        # This will help with the calculations later on
+        omega_500 = omega_500.values
+
+        # Create figure/map
+        fig, ax = self.create_map()
+
+        # OMEGA < -0.001 (green contourf)
+        # Define conditions
+        condition = omega_500 < -0.001
+        omega_500_m001 = (omega_500 * condition)
+        omega_500_m001[omega_500_m001 == 0] = np.nan
+        # Create plot
+        ax.contourf(self.lon_2d, self.lat_2d, omega_500_m001,
+                    colors='palegreen', transform=ccrs.PlateCarree(),
+                    alpha=0.6, level=1)
+
+        # OMEGA < -0.01 and UR > 40% average(1000/850) (orange contourf)
+        # Define conditions
+        rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
+        condition = (omega_500 < -0.01) & (rhum_1000_850 > 40)
+        omega_500_m01 = (omega_500 * condition) + (rhum_1000_850 * condition)
+        omega_500_m01[omega_500_m01 == 0] = np.nan
+        # Create plot
+        ax.contourf(self.lon_2d, self.lat_2d, omega_500_m01,
+                    colors='gold', transform=ccrs.PlateCarree(),
+                    alpha=0.6, level=1)
+
+        # OMEGA < -0.5 and UR > 70% average(1000/850/700/500) (red contourf)
+        # Define conditions
+        rhum_1000_850_700_500 = (
+            rhum_1000.values + rhum_850.values + rhum_700.values + rhum_500.values) / 4
+        condition = (omega_500 < -0.5) & (rhum_1000_850_700_500 > 70)
+        omega_500_m5 = (omega_500 * condition) + \
+            (rhum_1000_850_700_500 * condition)
+        omega_500_m5[omega_500_m5 == 0] = np.nan
+        # Create plot
+        ax.contourf(self.lon_2d, self.lat_2d, omega_500_m5,
+                    colors='red', transform=ccrs.PlateCarree(),
+                    alpha=0.6, level=1)
+
+        # 500hPa geopotential height (black contour)
+        cs = ax.contour(self.lon_2d, self.lat_2d, hgpt_500,
+                        colors='black', transform=ccrs.PlateCarree(),
+                        alpha=0.5)
+        ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
+
+        # 500hPa Streamlines (gray streamlines)
+        ax.streamplot(self.lon_2d, self.lat_2d,
+                      np.array(uwnd_500), np.array(vwnd_500),
+                      transform=ccrs.PlateCarree(), color='black')
+
+        ax.set_title('Chuva', fontsize=16, ha='center')
+        return fig
 
     def thunderstorm_showers(self):
         """
@@ -234,6 +369,24 @@ class CalculateCharts:
         250hPa divergence (blue contourf)
         250hPa Streamlines (gray streamlines)
         """
+        # Define variables
+        omega_500 = self.variables.omega(500)
+        rhum_1000 = self.variables.relative_humidity(1000)
+        rhum_500 = self.variables.relative_humidity(500)
+        k_index = self.indices.k()
+        tt_index = self.indices.tt()
+        li_index = self.indices.li()
+        uwnd_250, vwnd_250 = self.variables.wind_components(250)
+
+        # This will help with the calculations later on
+        omega_500 = omega_500.values
+
+        # Create figure
+
+        # OMEGA (500hPa) -0.001 and UR > 40% average(1000/500) and K >30 TTS>45 LIF < -1 (red contourf)
+        # OMEGA (500hPa) -0.001 and UR > 40% average(1000/500) and K >30 TTS>45 (orange contourf)
+        # 250hPa divergence (blue contourf)
+        # 250hPa Streamlines (gray streamlines)
 
     def storms(self):
         """
@@ -345,9 +498,9 @@ class CalculateCharts:
     #     cint = np.arange(-8, 9)
     #     cf = ax.contourf(lon_2d, lat_2d, 3 * adv.to(units('delta_degC/hour')), cint[cint != 0],
     #                      extend='both', cmap='bwr', transform=datacrs)
-    #     cax = plt.subplot(gs[1])
-    #     cb = plt.colorbar(cf, cax=cax, orientation='horizontal', extendrect=True, ticks=cint)
-    #     cb.set_label(r'$^{o}C/3h$', size='large')
+        # cax = plt.subplot(gs[1])
+        # cb = plt.colorbar(cf, cax=cax, orientation='horizontal', extendrect=True, ticks=cint)
+        # cb.set_label(r'$^{o}C/3h$', size='large')
 
         # # Add state/country boundaries to plot
         # states_provinces = cfeature.NaturalEarthFeature(
