@@ -454,7 +454,7 @@ class CalculateCharts:
         # Put plot on ax = gs[0] (row 0)
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, div_250,
                           cmap='Blues', transform=ccrs.PlateCarree(),
-                          alpha=0.5, levels=levels)
+                          alpha=0.7, levels=levels)
         # Put colorbar on gs[3] (row 3)
         gs3 = plt.subplot(gs[3])
         colorbar = plt.colorbar(gs0,
