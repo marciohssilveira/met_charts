@@ -146,7 +146,7 @@ class CalculateCharts:
 
         # UR > 70% average (1000, 850) (green countour)
         rhum_1000_850 = (rhum_1000.values + rhum_850.values) / 2
-        levels = np.arange(70, 105, 5)  # Relative humidity intervals
+        levels = np.arange(70, 110, 10)  # Relative humidity intervals
         # Put plot on ax = gs[0] (row 0)
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, rhum_1000_850,
                           cmap='Greens', transform=ccrs.PlateCarree(),
@@ -236,8 +236,8 @@ class CalculateCharts:
         k_30_tt_45 = (k_index + tt_index) * condition
         k_30_tt_45[k_30_tt_45 == 0] = np.nan
         # Put plot on ax = gs[0] (row 0)
-        levels = np.arange(np.nanmin(k_30_tt_45), np.nanmax(k_30_tt_45) + 1,
-                           (np.nanmax(k_30_tt_45) - np.nanmin(k_30_tt_45)) / 6)
+        levels = np.arange(np.nanmin(k_30_tt_45), np.nanmax(k_30_tt_45) + 10,
+                           (np.nanmax(k_30_tt_45) - np.nanmin(k_30_tt_45)) / 10)
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45,
                           cmap='Greens', transform=ccrs.PlateCarree(),
                           alpha=0.3, levels=levels, extend='max')
@@ -257,8 +257,8 @@ class CalculateCharts:
         k_30_tt_45_li_m1 = (k_index + tt_index + li_index) * condition
         k_30_tt_45_li_m1[k_30_tt_45_li_m1 == 0] = np.nan
         # Put another plot on ax = gs[0] (row 0)
-        levels = np.arange(np.nanmin(k_30_tt_45_li_m1), np.nanmax(k_30_tt_45_li_m1) + 1,
-                           (np.nanmax(k_30_tt_45_li_m1) - np.nanmin(k_30_tt_45_li_m1)) / 6)
+        levels = np.arange(np.nanmin(k_30_tt_45_li_m1), np.nanmax(k_30_tt_45_li_m1) + 10,
+                           (np.nanmax(k_30_tt_45_li_m1) - np.nanmin(k_30_tt_45_li_m1)) / 10)
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, k_30_tt_45_li_m1,
                           cmap='Reds', transform=ccrs.PlateCarree(),
                           alpha=0.3, levels=levels, extend='max')
@@ -354,7 +354,8 @@ class CalculateCharts:
         rhum_1000_850_700_500 = (
             rhum_1000.values + rhum_850.values + rhum_700.values + rhum_500.values) / 4
         condition = (omega_500 < -0.5) & (rhum_1000_850_700_500 > 70)
-        omega_500_m5_rhum_1000_850_700_500 = (omega_500 + rhum_1000_850_700_500) * condition
+        omega_500_m5_rhum_1000_850_700_500 = (
+            omega_500 + rhum_1000_850_700_500) * condition
         omega_500_m5_rhum_1000_850_700_500[omega_500_m5_rhum_1000_850_700_500 == 0] = np.nan
         # Create plot
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, omega_500_m5_rhum_1000_850_700_500,
@@ -398,9 +399,11 @@ class CalculateCharts:
         tt_index = self.indices.tt()
         li_index = self.indices.li()
         uwnd_250, vwnd_250 = self.variables.wind_components(250)
+        div_250 = self.variables.divergence(250)
 
         # This will help with the calculations later on
         omega_500 = omega_500.values
+        div_250 = div_250.values
 
         # Create figure
         fig, ax, gs = self.create_map()
@@ -408,8 +411,10 @@ class CalculateCharts:
         # OMEGA (500hPa) -0.001 and UR > 40% average(1000/500) and K >30 TTS>45 (orange contourf)
         rhum_1000_500 = (rhum_1000.values + rhum_500.values) / 2
         # Define conditions
-        condition = (omega_500 < -0.001) & (rhum_1000_500 > 40) & (k_index > 30) & (tt_index > 45)
-        omega_500_m001_rh_1000_500 = (omega_500 + rhum_1000_500 + k_index + tt_index) * condition
+        condition = (omega_500 < -0.001) & (rhum_1000_500 >
+                                            40) & (k_index > 30) & (tt_index > 45)
+        omega_500_m001_rh_1000_500 = (
+            omega_500 + rhum_1000_500 + k_index + tt_index) * condition
         omega_500_m001_rh_1000_500[omega_500_m001_rh_1000_500 == 0] = np.nan
         # Create plot
         # Put colorbar on gs[1] (row 1)
@@ -426,13 +431,15 @@ class CalculateCharts:
 
         # OMEGA (500hPa) -0.001 and UR > 40% average(1000/500) and K > 30 TTS > 45 LIF < -1 (red contourf)
         # Define conditions
-        condition = (omega_500 < -0.001) & (rhum_1000_500 > 40) & (k_index > 30) & (tt_index > 45) & (li_index < -1 )
-        omega_500_m001_rh_1000_500 = (omega_500 + rhum_1000_500 + k_index + tt_index + li_index) * condition
+        condition = (omega_500 < -0.001) & (rhum_1000_500 >
+                                            40) & (k_index > 30) & (tt_index > 45) & (li_index < -1)
+        omega_500_m001_rh_1000_500 = (
+            omega_500 + rhum_1000_500 + k_index + tt_index + li_index) * condition
         omega_500_m001_rh_1000_500[omega_500_m001_rh_1000_500 == 0] = np.nan
         # Create plot
-        # Put colorbar on gs[2] (row 2)
         gs0 = ax.contourf(self.lon_2d, self.lat_2d, omega_500_m001_rh_1000_500,
                           colors='red', transform=ccrs.PlateCarree(), level=1)
+        # Put colorbar on gs[2] (row 2)
         gs2 = plt.subplot(gs[2])
         colorbar = plt.colorbar(gs0,
                                 cax=gs2,   # cax means where the colorbar is gonna be put on
@@ -443,6 +450,19 @@ class CalculateCharts:
             'Omega < -0.001 Pa/s em 500 hPa, UR > 40% nos níveis 1000/500 e combinação de índices K > 30, TTS > 45 e LIF < -1', size='small')
 
         # 250hPa divergence (blue contourf)
+        levels = np.arange(0, div_250.max(), 5)  # Relative humidity intervals
+        # Put plot on ax = gs[0] (row 0)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, div_250,
+                          cmap='Blues', transform=ccrs.PlateCarree(),
+                          alpha=0.5, levels=levels)
+        # Put colorbar on gs[3] (row 3)
+        gs3 = plt.subplot(gs[3])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs3,   # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title('Divergência (10^6) em 250 hPa', size='small')
 
         # 250hPa Streamlines (gray streamlines)
         ax.streamplot(self.lon_2d, self.lat_2d,
@@ -467,8 +487,11 @@ class CalculateCharts:
         k_index = self.indices.k()
         tt_index = self.indices.tt()
         li_index = self.indices.li()
-        uwnd_250, vwnd_250 = self.variables.wind_components(250)
-        
+        _, wnd_spd_850 = self.variables.wind(850)
+        _, wnd_spd_250 = self.variables.wind(250)
+        uwnd_850, vwnd_850 = self.variables.wind_components(850)
+        prwt = self.variables.precipitable_water()
+
         # Create figure
         fig, ax, gs = self.create_map()
 
@@ -477,8 +500,10 @@ class CalculateCharts:
         rhum_1000_500 = (rhum_1000.values + rhum_500.values) / 2
         # OMEGA -0.001 and UR > 40% average(1000/500) and K > 35 TTS > 50 LIF < -4 (purple contourf)
         # Define conditions
-        condition = (omega_500 < -0.001) & (rhum_1000_500 > 40) & (k_index > 35) & (tt_index > 50) & (li_index < -4 )
-        omega_500_m001_rh_1000_500 = (omega_500 + rhum_1000_500 + k_index + tt_index + li_index) * condition
+        condition = (omega_500 < -0.001) & (rhum_1000_500 >
+                                            40) & (k_index > 35) & (tt_index > 50) & (li_index < -4)
+        omega_500_m001_rh_1000_500 = (
+            omega_500 + rhum_1000_500 + k_index + tt_index + li_index) * condition
         omega_500_m001_rh_1000_500[omega_500_m001_rh_1000_500 == 0] = np.nan
         # Create plot
         # Put colorbar on gs[1] (row 1)
@@ -488,17 +513,69 @@ class CalculateCharts:
         colorbar = plt.colorbar(gs0,
                                 cax=gs1,   # cax means where the colorbar is gonna be put on
                                 orientation='horizontal',
-                                extendrect=False,
+                                extendrect=True,
                                 ticks=[])
         colorbar.ax.set_title(
             'Omega < -0.001 Pa/s em 500 hPa, UR > 40% nos níveis 1000/500 e combinação de índices K > 35, TTS > 50 e LIF < -4', size='small')
 
         # 850hPa wind (green contourf)
-        # 850hPa >15m/s wind (vector)
-        # 250hPa jetstream (wind > 35m/s) (yellow contourf)
+
+        # 850hPa >15kt wind (vector)
+        # Conditions
+        condition = np.array(wnd_spd_850) > 15
+        uwnd_850 = np.array(uwnd_850)
+        vwnd_850 = np.array(vwnd_850)
+        uwnd_850 = uwnd_850 * condition
+        vwnd_850 = vwnd_850 * condition
+        uwnd_850[uwnd_850 == 0] = np.nan
+        vwnd_850[vwnd_850 == 0] = np.nan
+        # Create plot
+        ax.barbs(self.lon_2d, self.lat_2d, uwnd_850, vwnd_850, length=5,
+                 regrid_shape=25, transform=ccrs.PlateCarree(),
+                 barbcolor='midnightblue', barb_increments={'half': 5, 'full': 10, 'flag': 50})
+
         # Precipitable water 40-60mm (red contour)
+        # Create plot
+        levels = np.arange(40, 60, 5)
+        # Put another plot on ax = gs[0] (row 0)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, prwt,
+                          cmap='Blues', transform=ccrs.PlateCarree(),
+                          alpha=0.5, levels=levels, extend='max')
+        # Put colorbar on gs[2] (row 2)
+        gs2 = plt.subplot(gs[2])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs2,  # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title(
+            'Água precipitável > 60 kg.m-2', size='small')
+
+        # 250hPa jetstream (wind > 60kt) (yellow contourf)
+        # Create plot
+        levels = np.arange(60, np.nanmax(wnd_spd_250) + 10, 10)
+        # Put another plot on ax = gs[0] (row 0)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, wnd_spd_250,
+                          cmap='YlOrRd', transform=ccrs.PlateCarree(),
+                          alpha=0.5, levels=levels)
+        # Put colorbar on gs[3] (row 3)
+        gs3 = plt.subplot(gs[3])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs3,  # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=levels)
+        colorbar.ax.set_title(
+            'Corrente de jato (Vento em 250 hPa > 60 nós)', size='small')
+
         # 850hPa streamlines (gray streamlines)
+        uwnd_850, vwnd_850 = self.variables.wind_components(850)
+        ax.streamplot(self.lon_2d, self.lat_2d,
+                np.array(uwnd_850), np.array(vwnd_850),
+                transform=ccrs.PlateCarree(), color='slategray')
         ax.set_title('Tempestades', fontsize=16, ha='center')
+
+        return fig
 
     def hail(self):
         """

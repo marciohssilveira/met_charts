@@ -136,3 +136,40 @@ class ExtractVariables:
         omega = self.data["Vertical_velocity_pressure_isobaric"][self.time_step][index_level]
         omega.attrs["units"] = "Pa/s"
         return omega
+
+    def precipitable_water(self):
+        """
+        Extract values of precipitable water.
+        In return you will have a xarray.Dataset for the desired time and level.
+        """
+        prwt = self.data["Precipitable_water_entire_atmosphere_single_layer"][self.time_step]
+        prwt.attrs["units"] = "kg.m-2"
+        return prwt
+
+    def divergence(self, level):
+        """
+        The entire dataset is in this box:
+        north=0, south=-40
+        east=-25, west=-70
+        The maps are being plotted using this extent:
+        north=-10, south=-30
+        east=-35, west=-60
+        """
+        # Grab lat/lon values
+        lat = self.data['lat'].values
+        lon = self.data['lon'].values
+
+        # Compute dx and dy spacing for use in divergence calculation
+        dx, dy = mpcalc.lat_lon_grid_deltas(lon, lat)
+
+        # Extract wind components
+        uwnd, vwnd = self.wind_components(level)
+
+        # Use MetPy to compute the divergence for the given wind level
+        div = mpcalc.divergence(uwnd, vwnd, dx, dy)
+        div = xr.DataArray(div)
+        div.attrs['units'] = '1/s'
+        return div * 100000
+
+
+
