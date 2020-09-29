@@ -12,38 +12,38 @@ class CalculateIndices:
         self.time_step = 0
 
         # Use the functions in Class ExtractVariables
-        # To create the useful data for indices calculations
         variables = ExtractVariables(self.data)
 
-        self.tair_850 = variables.temperature(850)
-        self.tair_700 = variables.temperature(700)
-        self.tair_500 = variables.temperature(500)
-        self.dewp_850 = variables.temperature(850)
-        self.dewp_700 = variables.temperature(700)
-        self.wind_spd_850, self.wind_dir_850 = variables.wind(850)
-        self.wind_spd_500, self.wind_dir_500 = variables.wind(500)
+        # Assign variables to the data creation functions on ExtractVariables class
+        self.tair = variables.temperature
+        self.dewp = variables.dew_point
+        self.wind_dir = variables.wind_direction
+        self.wind_spd = variables.wind_speed
 
     def k(self):
         # Calculate K-index
-        k_index = (
-            (self.tair_850.values - self.tair_500.values)
-            + self.dewp_850.values
-            - (self.tair_700.values - self.dewp_700.values)
-        )
+        k_index = ((self.tair(850) - self.tair(500)) +
+                   self.dewp(850) - (self.tair(700) - self.dewp(700)))
 
         # Smooth the data
         k_index = mpcalc.smooth_gaussian(k_index, 2)
 
-        return np.array(k_index)
+        return k_index
 
     def tt(self):
         # Calculate TT-index
-        tt_index = (self.tair_850.values + self.dewp_850.values) - (2 * self.tair_500.values)
+        tt_index = (self.tair(850) + self.dewp(850)) - (2 * self.tair(500))
 
         # Smooth the data
         tt_index = mpcalc.smooth_gaussian(tt_index, 2)
 
-        return np.array(tt_index)
+        return tt_index
+
+    def vt(self):
+        # Calculate VT-index
+        vt_index = self.tair(850) - self.tair(500)
+
+        return vt_index
 
     def li(self):
         # Extract LI-index
@@ -61,15 +61,11 @@ class CalculateIndices:
         cis = sen [direção (graus) V500hPa -V850hPa]
         """
         # Calculate SWEAT-index
-        cis = np.sin((self.wind_dir_500.magnitude -
-                      self.wind_dir_850.magnitude))
-        sweat_index = ((12 * self.tair_850.values) +
-                       (20 * (self.tt() - 49)) +
-                       (2 * self.wind_spd_850.magnitude) +
-                       self.wind_spd_500.magnitude +
-                       (125 * (cis * 0.2)))
+        cis = np.sin((self.wind_dir(500) - self.wind_dir(850)))
+        sweat_index = ((12 * self.tair(850)) + (20 * (self.tt() - 49)) +
+                       (2 * self.wind_spd(850)) + self.wind_spd(500) + (125 * (cis * 0.2)))
 
         # Smooth the data
         sweat_index = mpcalc.smooth_gaussian(sweat_index, 2)
 
-        return np.array(sweat_index)
+        return sweat_index
