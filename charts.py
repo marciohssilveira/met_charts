@@ -4,6 +4,8 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import metpy.calc as mpcalc
 import numpy as np
+import pandas as pd
+from datetime import datetime
 from metpy.units import units
 
 from indices import CalculateIndices
@@ -11,12 +13,17 @@ from variables import ExtractVariables
 
 
 class CalculateCharts:
-    def __init__(self, data):
+    def __init__(self, data, time_step):
         self.data = data
+        self.time_step = time_step
+
+        # Getting a time stamp to be used in the charts
+        date = pd.to_datetime(np.datetime_as_string(data['time'][self.time_step].values, unit='h', timezone='UTC'))
+        self.time_stamp = f'{date.day:02d}-{date.month:02d}-{date.year} {date.hour:02d}UTC'
 
         # Use the functions in Class ExtractVariables and CalculateIndices
-        indices = CalculateIndices(self.data)
-        variables = ExtractVariables(self.data)
+        indices = CalculateIndices(self.data, self.time_step)
+        variables = ExtractVariables(self.data, self.time_step)
 
         # Assign variables to the data creation functions on ExtractVariables class
         # Indices
@@ -226,18 +233,18 @@ class CalculateCharts:
                         transform=ccrs.PlateCarree(), alpha=0.6, levels=levels)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
 
-        # Insert info on other elements of the plot on row 4
-        label = 'teste\n teste'
-        gs3 = plt.subplot(gs[3])
-        ax.annotate(label,
-                    xy=(0.5, 0), xytext=(0, 10),
-                    xycoords=('axes fraction', 'figure fraction'),
-                    textcoords='offset points',
-                    size=14, ha='center', va='bottom')
+        # # Insert info on other elements of the plot on row 4
+        # label = 'teste\n teste'
+        # gs3 = plt.subplot(gs[3])
+        # ax.annotate(label,
+        #             xy=(0.5, 0), xytext=(0, 10),
+        #             xycoords=('axes fraction', 'figure fraction'),
+        #             textcoords='offset points',
+        #             size=14, ha='center', va='bottom')
 
         # Create title
-        ax.set_title('Umidade e/ou nebulosidade', fontsize=16, ha='center')
-        return fig
+        ax.set_title(f'Umidade e/ou nebulosidade {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/umidade_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def showers_heat_humidity(self):
         """
@@ -309,8 +316,8 @@ class CalculateCharts:
                         colors='black', transform=ccrs.PlateCarree(),
                         alpha=0.5, levels=cint)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
-        ax.set_title('Pancadas por calor e umidade', fontsize=16, ha='center')
-        return fig
+        ax.set_title(f'Pancadas por calor e umidade {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/pancadas_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def rain(self):
         """
@@ -390,8 +397,8 @@ class CalculateCharts:
         ax.streamplot(self.lon_2d, self.lat_2d, self.u_wnd(500), self.v_wnd(500),
                       transform=ccrs.PlateCarree(), color='slategray')
 
-        ax.set_title('Chuva', fontsize=16, ha='center')
-        return fig
+        ax.set_title(f'Chuva {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/chuva_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def thunderstorm_showers(self):
         """
@@ -465,9 +472,9 @@ class CalculateCharts:
         # 250hPa Streamlines (gray streamlines)
         ax.streamplot(self.lon_2d, self.lat_2d, self.u_wnd(250), self.v_wnd(250),
                       transform=ccrs.PlateCarree(), color='slategray')
-        ax.set_title('Pancadas de chuva com trovoada',
+        ax.set_title(f'Pancadas de chuva com trovoada {self.time_stamp}',
                      fontsize=16, ha='center')
-        return fig
+        plt.savefig(f'./img/pancadas_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def storms(self):
         """
@@ -559,8 +566,8 @@ class CalculateCharts:
         ax.streamplot(self.lon_2d, self.lat_2d, self.u_wnd(850), self.v_wnd(850),
                       transform=ccrs.PlateCarree(), color='slategray')
 
-        ax.set_title('Tempestades', fontsize=16, ha='center')
-        return fig
+        ax.set_title(f'Tempestades {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/tempestades_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def hail(self):
         """
@@ -627,8 +634,8 @@ class CalculateCharts:
         colorbar.set_label('Omega em 500 hPa < 0.3 Pa/s', size=8)
         colorbar.ax.tick_params(labelsize=8)
 
-        ax.set_title('Granizo', fontsize=16, ha='center')
-        return fig
+        ax.set_title(f'Granizo {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/granizo_{self.time_step:02d}_{self.time_stamp}.jpg')
 
     def instability(self):
         """

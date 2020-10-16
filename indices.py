@@ -7,12 +7,12 @@ from variables import ExtractVariables
 
 
 class CalculateIndices:
-    def __init__(self, data):
+    def __init__(self, data, time_step):
         self.data = data
-        self.time_step = 0
+        self.time_step = time_step
 
         # Use the functions in Class ExtractVariables
-        variables = ExtractVariables(self.data)
+        variables = ExtractVariables(self.data, self.time_step)
 
         # Assign variables to the data creation functions on ExtractVariables class
         self.tair = variables.temperature
