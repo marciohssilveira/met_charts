@@ -18,7 +18,7 @@ class CalculateCharts:
         self.time_step = time_step
 
         # Getting a time stamp to be used in the charts
-        date = pd.to_datetime(np.datetime_as_string(data['time'][self.time_step].values, unit='h', timezone='UTC'))
+        date = pd.to_datetime(np.datetime_as_string(data['time3'][self.time_step].values, unit='h', timezone='UTC'))
         self.time_stamp = f'{date.day:02d}-{date.month:02d}-{date.year} {date.hour:02d}UTC'
 
         # Use the functions in Class ExtractVariables and CalculateIndices
@@ -244,7 +244,7 @@ class CalculateCharts:
 
         # Create title
         ax.set_title(f'Umidade e/ou nebulosidade {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/umidade_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/umidade_{self.time_step:02d}.jpg')
 
     def showers_heat_humidity(self):
         """
@@ -317,7 +317,7 @@ class CalculateCharts:
                         alpha=0.5, levels=cint)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
         ax.set_title(f'Pancadas por calor e umidade {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/pancadas_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/pancadas_{self.time_step:02d}.jpg')
 
     def rain(self):
         """
@@ -398,7 +398,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
 
         ax.set_title(f'Chuva {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/chuva_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/chuva_{self.time_step:02d}.jpg')
 
     def thunderstorm_showers(self):
         """
@@ -474,7 +474,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
         ax.set_title(f'Pancadas de chuva com trovoada {self.time_stamp}',
                      fontsize=16, ha='center')
-        plt.savefig(f'./img/pancadas_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/pancadas_{self.time_step:02d}.jpg')
 
     def storms(self):
         """
@@ -567,7 +567,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
 
         ax.set_title(f'Tempestades {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/tempestades_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/tempestades_{self.time_step:02d}.jpg')
 
     def hail(self):
         """
@@ -635,14 +635,38 @@ class CalculateCharts:
         colorbar.ax.tick_params(labelsize=8)
 
         ax.set_title(f'Granizo {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/granizo_{self.time_step:02d}_{self.time_stamp}.jpg')
+        plt.savefig(f'./img/granizo_{self.time_step:02d}.jpg')
 
     def instability(self):
         """
         index() = ((K > 30) + (TT > 45) + (SWEAT > 220)) / 3
         if index() > 1, then unstable
         """
-        pass
+         # Create figure/map
+        fig, ax, gs = self.create_map()
+
+        # Define conditions
+        condition_1 = (self.k_index() > 30) & (self.tt_index() > 45) & (self.sweat_index() > 220)
+        combination_1 = (self.k_index() + self.tt_index() + self.sweat_index()) * condition_1
+        combination_1[combination_1 == 0] = np.nan
+        # Put plot on ax = gs[0] (row 0)
+        levels = np.arange(np.nanmin(combination_1), np.nanmax(combination_1) + 10,
+                           (np.nanmax(combination_1) - np.nanmin(combination_1)) / 10)
+        gs0 = ax.contourf(self.lon_2d, self.lat_2d, combination_1,
+                          cmap='Reds', transform=ccrs.PlateCarree(),
+                          alpha=0.3, levels=levels, extend='max')
+        # Put colorbar on gs[1] (row 1)
+        gs1 = plt.subplot(gs[1])
+        colorbar = plt.colorbar(gs0,
+                                cax=gs1,   # cax means where the colorbar is gonna be put on
+                                orientation='horizontal',
+                                extendrect=True,
+                                ticks=[int(x) for x in levels])
+        colorbar.set_label('Combinação de índices: K > 30, TTS > 45 e SWEAT > 220. Valores > 1 indicam instabilidade.', size=8)
+        colorbar.ax.tick_params(labelsize=8)
+
+        ax.set_title(f'Instabilidade {self.time_stamp}', fontsize=16, ha='center')
+        plt.savefig(f'./img/instabilidade_{self.time_step:02d}.jpg')
 
     # def temperature_advection(self):
     #     # Pull out variables you want to use
