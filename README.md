@@ -36,9 +36,6 @@ charts = CalculateCharts(data, time_step)
 
 ```
 
-    Performing calculations
-
-
 
 ```python
 charts.clouds_humidity()
