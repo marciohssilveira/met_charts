@@ -14,3 +14,7 @@ src/__pycache__/charts.cpython-38.pyc
 src/__pycache__/data.cpython-38.pyc
 src/__pycache__/indices.cpython-38.pyc
 src/__pycache__/variables.cpython-38.pyc
+src/__pycache__/__init__.cpython-38.pyc
+src/__init__.py
+.ipynb_checkpoints/demo-checkpoint.ipynb
+demo.ipynb

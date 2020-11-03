@@ -479,7 +479,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
         ax.set_title(f'Pancadas de chuva com trovoada {self.time_stamp}',
                      fontsize=16, ha='center')
-        plt.savefig(f'./img/pancadas_{self.time_step:02d}.jpg')
+        plt.savefig(f'./img/trovoadas_{self.time_step:02d}.jpg')
 
     def storms(self):
         """
