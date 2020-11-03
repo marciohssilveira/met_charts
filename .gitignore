@@ -1,8 +1,15 @@
 venv
 /.vscode
-/__pycache__
+data/data.nc
 .DS_Store
-data.nc
+__pycache__/charts.cpython-38.pyc
+__pycache__/data.cpython-38.pyc
+__pycache__/extract_variables.cpython-38.pyc
+__pycache__/get_data.cpython-38.pyc
+__pycache__/indices.cpython-38.pyc
+__pycache__/variables.cpython-38.pyc
+img/.DS_Store
+src/.DS_Store
 src/__pycache__/charts.cpython-38.pyc
 src/__pycache__/data.cpython-38.pyc
 src/__pycache__/indices.cpython-38.pyc
