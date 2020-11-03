@@ -18,12 +18,15 @@ class CalculateCharts:
         self.time_step = time_step
 
         # Getting a time stamp to be used in the charts
-        date = pd.to_datetime(np.datetime_as_string(data['time3'][self.time_step].values, unit='h', timezone='UTC'))
+        date = pd.to_datetime(np.datetime_as_string(
+            data['time'][self.time_step].values, unit='h', timezone='UTC'))
         self.time_stamp = f'{date.day:02d}-{date.month:02d}-{date.year} {date.hour:02d}UTC'
 
         # Use the functions in Class ExtractVariables and CalculateIndices
         indices = CalculateIndices(self.data, self.time_step)
         variables = ExtractVariables(self.data, self.time_step)
+
+        print('Performing calculations')
 
         # Assign variables to the data creation functions on ExtractVariables class
         # Indices
@@ -117,7 +120,7 @@ class CalculateCharts:
                                             scale_factor=None)
 
         # Create new figure
-        fig = plt.figure(figsize=(10, 14))
+        plt.figure(figsize=(10, 14))
 
         # Control the figures with GridSpec
         gs = gridspec.GridSpec(
@@ -155,7 +158,7 @@ class CalculateCharts:
         ax.scatter(lons_2, lats_2, transform=ccrs.PlateCarree(),
                    marker="*", c='black', zorder=99)
 
-        return fig, ax, gs
+        return ax, gs
 
     def clouds_humidity(self):
         """
@@ -166,7 +169,7 @@ class CalculateCharts:
         Sea level pressure (black contour)
         """
         # Create figure/map/grids
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # UR > 70% average (1000, 850) (green countour)
         rhum_1 = np.mean([self.rhum(1000), self.rhum(850)], axis=0)
@@ -243,7 +246,8 @@ class CalculateCharts:
         #             size=14, ha='center', va='bottom')
 
         # Create title
-        ax.set_title(f'Umidade e/ou nebulosidade {self.time_stamp}', fontsize=16, ha='center')
+        ax.set_title(
+            f'Umidade e/ou nebulosidade {self.time_stamp}', fontsize=16, ha='center')
         plt.savefig(f'./img/umidade_{self.time_step:02d}.jpg')
 
     def showers_heat_humidity(self):
@@ -254,7 +258,7 @@ class CalculateCharts:
         300hPa geopotential height (black contour)
         """
         # Create figure/map
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # K > 30 + TTS > 45 (green countourf)
         # Define conditions
@@ -316,7 +320,8 @@ class CalculateCharts:
                         colors='black', transform=ccrs.PlateCarree(),
                         alpha=0.5, levels=cint)
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
-        ax.set_title(f'Pancadas por calor e umidade {self.time_stamp}', fontsize=16, ha='center')
+        ax.set_title(
+            f'Pancadas por calor e umidade {self.time_stamp}', fontsize=16, ha='center')
         plt.savefig(f'./img/pancadas_{self.time_step:02d}.jpg')
 
     def rain(self):
@@ -328,7 +333,7 @@ class CalculateCharts:
         500hPa Streamlines (gray streamlines)
         """
         # Create figure/map
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # OMEGA < -0.001 (green contourf)
         # Define conditions
@@ -408,7 +413,7 @@ class CalculateCharts:
         250hPa Streamlines (gray streamlines)
         """
         # Create figure
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # 250hPa divergence (blue contourf)
         # Put plot on ax = gs[0] (row 0)
@@ -486,7 +491,7 @@ class CalculateCharts:
         850hPa streamlines (gray streamlines)
         """
         # Create figure
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # OMEGA -0.001 and UR > 40% average(1000/500) and K > 35 TTS > 50 LIF < -4 (purple contourf)
         # Define conditions
@@ -566,7 +571,8 @@ class CalculateCharts:
         ax.streamplot(self.lon_2d, self.lat_2d, self.u_wnd(850), self.v_wnd(850),
                       transform=ccrs.PlateCarree(), color='slategray')
 
-        ax.set_title(f'Tempestades {self.time_stamp}', fontsize=16, ha='center')
+        ax.set_title(f'Tempestades {self.time_stamp}',
+                     fontsize=16, ha='center')
         plt.savefig(f'./img/tempestades_{self.time_step:02d}.jpg')
 
     def hail(self):
@@ -577,7 +583,7 @@ class CalculateCharts:
         500hPa OMEGA > -2 (orange contour)
         """
         # Create figure
-        fig, ax, gs = self.create_map()
+        ax, gs = self.create_map()
 
         # OMEGA -0.001 and UR > 70% average(1000/500) and TTS > 50 VT > 25 SWEAT > 220 LIF < -2 (blue contourf)
         # Define conditions
@@ -642,12 +648,14 @@ class CalculateCharts:
         index() = ((K > 30) + (TT > 45) + (SWEAT > 220)) / 3
         if index() > 1, then unstable
         """
-         # Create figure/map
-        fig, ax, gs = self.create_map()
+        # Create figure/map
+        ax, gs = self.create_map()
 
         # Define conditions
-        condition_1 = (self.k_index() > 30) & (self.tt_index() > 45) & (self.sweat_index() > 220)
-        combination_1 = (self.k_index() + self.tt_index() + self.sweat_index()) * condition_1
+        condition_1 = (self.k_index() > 30) & (
+            self.tt_index() > 45) & (self.sweat_index() > 220)
+        combination_1 = (self.k_index() + self.tt_index() +
+                         self.sweat_index()) * condition_1
         combination_1[combination_1 == 0] = np.nan
         # Put plot on ax = gs[0] (row 0)
         levels = np.arange(np.nanmin(combination_1), np.nanmax(combination_1) + 10,
@@ -662,10 +670,12 @@ class CalculateCharts:
                                 orientation='horizontal',
                                 extendrect=True,
                                 ticks=[int(x) for x in levels])
-        colorbar.set_label('Combinação de índices: K > 30, TTS > 45 e SWEAT > 220. Valores > 1 indicam instabilidade.', size=8)
+        colorbar.set_label(
+            'Combinação de índices: K > 30, TTS > 45 e SWEAT > 220. Valores > 1 indicam instabilidade.', size=8)
         colorbar.ax.tick_params(labelsize=8)
 
-        ax.set_title(f'Instabilidade {self.time_stamp}', fontsize=16, ha='center')
+        ax.set_title(
+            f'Instabilidade {self.time_stamp}', fontsize=16, ha='center')
         plt.savefig(f'./img/instabilidade_{self.time_step:02d}.jpg')
 
     # def temperature_advection(self):
@@ -780,3 +790,7 @@ class CalculateCharts:
 
     #     plt.savefig('test.png')
     #     plt.show()
+
+
+if __name__ == "__main__":
+    pass

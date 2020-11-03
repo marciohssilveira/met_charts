@@ -3,3 +3,7 @@ venv
 /__pycache__
 .DS_Store
 data.nc
+src/__pycache__/charts.cpython-38.pyc
+src/__pycache__/data.cpython-38.pyc
+src/__pycache__/indices.cpython-38.pyc
+src/__pycache__/variables.cpython-38.pyc

@@ -27,7 +27,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric6"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric6"]) == level * 100)[0][0]
         # Extracting temperature data and converting to celsius
         tair = self.data["Temperature_isobaric"][self.time_step][index_level] - 273.15
         return np.array(tair)
@@ -39,7 +40,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Extracting relative humidity data
         rhum = self.data["Relative_humidity_isobaric"][self.time_step][index_level]
         return np.array(rhum)
@@ -53,13 +55,15 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Obtain relative humidity data for the given pressure level
         rhum = self.data["Relative_humidity_isobaric"][self.time_step][index_level]
         # Assigning units to make metpy function work
         rhum.attrs["units"] = "percent"
         # Obtain air temperature data for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric6"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric6"]) == level * 100)[0][0]
         tair = self.data["Temperature_isobaric"][self.time_step][index_level] - 273.15
         # Assigning units to make metpy function work
         tair.attrs["units"] = "degree_Celsius"
@@ -74,7 +78,8 @@ class ExtractVariables:
         In return you will have a pint.Quantity array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Extracting wind components data
         uwnd = self.data["u-component_of_wind_isobaric"][self.time_step][index_level]
         vwnd = self.data["v-component_of_wind_isobaric"][self.time_step][index_level]
@@ -89,7 +94,8 @@ class ExtractVariables:
         In return you will have a pint.Quantity array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Extracting wind components data
         uwnd = self.data["u-component_of_wind_isobaric"][self.time_step][index_level]
         vwnd = self.data["v-component_of_wind_isobaric"][self.time_step][index_level]
@@ -104,7 +110,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Extracting u-wind component data
         uwnd = self.data["u-component_of_wind_isobaric"][self.time_step][index_level]
         return np.array(uwnd)
@@ -116,7 +123,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric"]) == level * 100)[0][0]
         # Extracting v-wind component data
         vwnd = self.data["v-component_of_wind_isobaric"][self.time_step][index_level]
         return np.array(vwnd)
@@ -128,7 +136,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric6"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric6"]) == level * 100)[0][0]
         # Extracting geopotential height data
         hgpt = self.data["Geopotential_height_isobaric"][self.time_step][index_level]
         return np.array(hgpt)
@@ -149,7 +158,8 @@ class ExtractVariables:
         In return you will have a np.array for the desired time and level.
         """
         # Obtaining the index for the given pressure level
-        index_level = np.where(np.array(self.data["isobaric4"]) == level * 100)[0][0]
+        index_level = np.where(
+            np.array(self.data["isobaric4"]) == level * 100)[0][0]
         # Extracting omega data
         omega = self.data["Vertical_velocity_pressure_isobaric"][self.time_step][index_level]
         return np.array(omega)
@@ -183,3 +193,7 @@ class ExtractVariables:
         # Use MetPy to compute the divergence for the given wind level
         div = mpcalc.divergence(uwnd, vwnd, dx, dy)
         return np.array(div * 100000)
+
+
+if __name__ == "__main__":
+    pass

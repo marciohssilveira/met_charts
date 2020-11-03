@@ -69,3 +69,7 @@ class CalculateIndices:
         sweat_index = mpcalc.smooth_gaussian(sweat_index, 2)
 
         return sweat_index
+
+
+if __name__ == "__main__":
+    pass

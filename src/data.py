@@ -7,9 +7,16 @@ from xarray.backends import NetCDF4DataStore
 
 
 class GetGFSData:
-
-    def __init__(self, variables):
-        self.variables = variables
+    def __init__(self):
+        self.variables = ['Relative_humidity_isobaric',
+                          'Temperature_isobaric',
+                          'u-component_of_wind_isobaric',
+                          'v-component_of_wind_isobaric',
+                          'Best_4_layer_Lifted_Index_surface',
+                          'Geopotential_height_isobaric',
+                          'Precipitable_water_entire_atmosphere_single_layer',
+                          'Pressure_reduced_to_MSL_msl',
+                          'Vertical_velocity_pressure_isobaric']
         self.URL = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
         self.dataset = 'Latest Collection for GFS Quarter Degree Forecast'
 
@@ -56,7 +63,7 @@ class GetGFSData:
 
         ###########################################
         # We now request data from the server using this query.
-        print('Downloading data...')
+        print('Downloading new data...')
         start_time = time.time()
 
         raw_data = gfs_subset.get_data(query)
@@ -73,4 +80,8 @@ class GetGFSData:
         Takes the result of the get method, which is a xarray.Dataset 
         and stores it in a local file for debugging purposes
         """
-        
+        pass
+
+
+if __name__ == "__main__":
+    pass
