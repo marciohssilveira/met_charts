@@ -24,7 +24,7 @@ if __name__ == '__main__':
     start_time = time.time()
     print('Plotting charts')
 
-    for time_step in range(len(data['time'])):
+    for time_step in range(len(data['time2'])):
         charts = CalculateCharts(data, time_step)
         charts.clouds_humidity()
         charts.showers_heat_humidity()
@@ -35,4 +35,5 @@ if __name__ == '__main__':
         charts.instability()
 
     elapsed_time = time.time() - start_time
-    print(f'Process done in {elapsed_time} seconds')
+    print('Process done in {} seconds'.format(elapsed_time))
+
