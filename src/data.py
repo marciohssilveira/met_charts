@@ -48,7 +48,7 @@ class GetGFSData:
         # lonlat_box(west, east, south, north)
         query.lonlat_box(north=0, south=-40, east=-25, west=-70)
         now = dt.datetime.utcnow()
-        n_hours = 3
+        n_hours = 34
         query.time_range(now, now + dt.timedelta(hours=n_hours))
         query.accept('netcdf4')
 

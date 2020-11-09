@@ -22,9 +22,9 @@ if __name__ == '__main__':
     data = xr.open_dataset(PATH)
 
     start_time = time.time()
-    print('Plotting charts')
 
-    for time_step in range(len(data['time2'])):
+    for time_step in range(len(data[list(dict(data.dims).keys())[-1]])):
+        print('Plotting charts')
         charts = CalculateCharts(data, time_step)
         charts.clouds_humidity()
         charts.showers_heat_humidity()
@@ -36,4 +36,3 @@ if __name__ == '__main__':
 
     elapsed_time = time.time() - start_time
     print('Process done in {} seconds'.format(elapsed_time))
-

@@ -19,7 +19,7 @@ class CalculateCharts:
 
         # Getting a time stamp to be used in the charts
         date = pd.to_datetime(np.datetime_as_string(
-            data['time2'][self.time_step].values, unit='h', timezone='UTC'))
+            data[list(dict(self.data.dims).keys())[-1]][self.time_step].values, unit='h', timezone='UTC'))
         self.time_stamp = f'{date.day:02d}-{date.month:02d}-{date.year} {date.hour:02d}UTC'
 
         # Use the functions in Class ExtractVariables and CalculateIndices
