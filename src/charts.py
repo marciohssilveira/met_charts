@@ -248,7 +248,7 @@ class CalculateCharts:
         # Create title
         ax.set_title(
             f'Umidade e/ou nebulosidade {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/umidade_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/umidade_{self.time_step:02d}.jpg')
 
     def showers_heat_humidity(self):
         """
@@ -322,7 +322,7 @@ class CalculateCharts:
         ax.clabel(cs, inline=True, fontsize=8, fmt='%0.0f')
         ax.set_title(
             f'Pancadas por calor e umidade {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/pancadas_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/pancadas_{self.time_step:02d}.jpg')
 
     def rain(self):
         """
@@ -403,7 +403,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
 
         ax.set_title(f'Chuva {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/chuva_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/chuva_{self.time_step:02d}.jpg')
 
     def thunderstorm_showers(self):
         """
@@ -479,7 +479,7 @@ class CalculateCharts:
                       transform=ccrs.PlateCarree(), color='slategray')
         ax.set_title(f'Pancadas de chuva com trovoada {self.time_stamp}',
                      fontsize=16, ha='center')
-        plt.savefig(f'./img/trovoadas_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/trovoadas_{self.time_step:02d}.jpg')
 
     def storms(self):
         """
@@ -573,7 +573,7 @@ class CalculateCharts:
 
         ax.set_title(f'Tempestades {self.time_stamp}',
                      fontsize=16, ha='center')
-        plt.savefig(f'./img/tempestades_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/tempestades_{self.time_step:02d}.jpg')
 
     def hail(self):
         """
@@ -641,7 +641,7 @@ class CalculateCharts:
         colorbar.ax.tick_params(labelsize=8)
 
         ax.set_title(f'Granizo {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/granizo_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/granizo_{self.time_step:02d}.jpg')
 
     def instability(self):
         """
@@ -676,7 +676,7 @@ class CalculateCharts:
 
         ax.set_title(
             f'Instabilidade {self.time_stamp}', fontsize=16, ha='center')
-        plt.savefig(f'./img/instabilidade_{self.time_step:02d}.jpg')
+        plt.savefig(f'img/instabilidade_{self.time_step:02d}.jpg')
 
     # def temperature_advection(self):
     #     # Pull out variables you want to use

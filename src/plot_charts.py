@@ -12,12 +12,10 @@ import warnings
 warnings.filterwarnings("ignore")
 
 if __name__ == '__main__':
-    gfs = GetGFSData()
-    data = gfs.get()
+    gfs = GetGFSData() # instantiate the class containing the functions to download data
+    data = gfs.get() # fetch data
+    gfs.save(data) # save data to a local file in PATH (will replace the previous file)
     PATH = 'data/data.nc'
-    if os.path.exists(PATH):
-        os.remove(PATH)
-    data.to_netcdf(PATH)
 
     data = xr.open_dataset(PATH)
 

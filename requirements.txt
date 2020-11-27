@@ -1,8 +1,5 @@
-# Cartopy is working only on Python 3.6
-
 appdirs==1.4.4
 beautifulsoup4==4.9.3
-Cartopy==0.18.0
 certifi==2020.11.8
 cftime==1.2.1
 chardet==3.0.4
@@ -39,3 +36,13 @@ traitlets==4.3.3
 urllib3==1.25.11
 xarray==0.16.1
 zipp==3.4.0
+
+# Cartopy==0.18.0
+# For macOS, the required dependencies for cartopy must be installed in the this order:
+
+# brew install proj geos
+# pip3 install --upgrade cython numpy pyshp six
+# # shapely needs to be built from source to link to geos. If it is already
+# # installed, uninstall it by: pip3 uninstall shapely
+# pip3 install shapely --no-binary shapely
+# pip install cartopy

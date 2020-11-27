@@ -1,5 +1,6 @@
 import datetime as dt
 import time
+import os
 
 import xarray as xr
 from siphon.catalog import TDSCatalog
@@ -48,7 +49,7 @@ class GetGFSData:
         # lonlat_box(west, east, south, north)
         query.lonlat_box(north=0, south=-40, east=-25, west=-70)
         now = dt.datetime.utcnow()
-        n_hours = 34
+        n_hours = 24  # Sometimes, depending on the available RAM, it will give an error because it is trying to download a large .nc file
         query.time_range(now, now + dt.timedelta(hours=n_hours))
         query.accept('netcdf4')
 
@@ -75,12 +76,15 @@ class GetGFSData:
         dataset = xr.open_dataset(NetCDF4DataStore(raw_data))
         return dataset
 
-    def save(self):
+    def save(self, data):
         """
         Takes the result of the get method, which is a xarray.Dataset 
         and stores it in a local file for debugging purposes
         """
-        pass
+        PATH = 'data/data.nc'
+        if os.path.exists(PATH):
+            os.remove(PATH)
+        data.to_netcdf(PATH)
 
 
 if __name__ == "__main__":
