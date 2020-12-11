@@ -15,16 +15,16 @@ The method ```get()``` inside the class ```GetGFSData``` in [data.py](https://gi
 
 ## Examples
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/umidade_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/umidade_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/pancadas_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/pancadas_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/chuva_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/chuva_00.jpg)
        
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/trovoadas_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/trovoadas_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/tempestades_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/tempestades_00.jpg)
         
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/granizo_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/granizo_00.jpg)
       
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/img/instabilidade_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/instabilidade_00.jpg)
