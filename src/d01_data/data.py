@@ -21,7 +21,7 @@ class GetGFSData:
         self.URL = 'http://thredds.ucar.edu/thredds/catalog/grib/NCEP/GFS/Global_0p25deg/catalog.xml'
         self.dataset = 'Latest Collection for GFS Quarter Degree Forecast'
 
-    def get(self):
+    def get(self, n_hours):
         """
         :param coordinates: tuple like (lon, lat)
         :param variables: chosen list of variables based on the variables list for the dataset
@@ -49,7 +49,6 @@ class GetGFSData:
         # lonlat_box(west, east, south, north)
         query.lonlat_box(north=0, south=-40, east=-25, west=-70)
         now = dt.datetime.utcnow()
-        n_hours = 24  # Sometimes, depending on the available RAM, it will give an error because it is trying to download a large .nc file
         query.time_range(now, now + dt.timedelta(hours=n_hours))
         query.accept('netcdf4')
 
