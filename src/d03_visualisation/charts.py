@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 from metpy.units import units
+from metpy.plots import SkewT
 
 
 from d02_processing.indices import CalculateIndices
@@ -78,7 +79,9 @@ class CalculateCharts:
                        'SDIY': (-12.200556, -38.900556),
                        'SBSV': (-12.908611, -38.322500),
                        'SBIL': (-14.815000, -39.033333),
-                       'SNTF': (-17.524444, -39.668333)}
+                       'SNTF': (-17.524444, -39.668333),
+                       'SBCR': (-19.011944, -57.671389),
+                       'SBCG': (-20.469444, -54.670278)}
 
         self.area_2 = {'SBGR': (-23.435556, -46.473056),
                        'SBMT': (-23.506667, -46.633889),
@@ -95,8 +98,6 @@ class CalculateCharts:
                        'SBAE': (-22.157778, -49.068333),
                        'SBML': (-22.195556, -49.926944),
                        'SBDN': (-22.178333, -51.418889),
-                       'SBCR': (-19.011944, -57.671389),
-                       'SBCG': (-20.469444, -54.670278),
                        'SBTG': (-20.751389, -51.680278),
                        'SBDB': (-21.247222, -56.452500),
                        'SBDO': (-22.200556, -54.925556),
@@ -106,7 +107,8 @@ class CalculateCharts:
                        'SBTD': (-24.685278, -53.696389),
                        'SBCA': (-25.002222, -53.501944),
                        'SSGG': (-25.388333, -51.523611),
-                       'SBPO': (-26.217222, -52.694444)}
+                       'SBPO': (-26.217222, -52.694444),
+                       'SDAM': (-22.859167, -47.108056)}
         # Obtain coordinates
         self.lon_2d, self.lat_2d = variables.coordinates()
 
@@ -680,7 +682,6 @@ class CalculateCharts:
             f'Instabilidade {self.time_stamp}', fontsize=16, ha='center')
         plt.savefig(
             f'{self.output_path}/instabilidade_{self.time_step:02d}.jpg')
-
 
 if __name__ == "__main__":
     pass
