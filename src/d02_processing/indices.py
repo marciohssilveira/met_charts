@@ -1,7 +1,5 @@
 import metpy.calc as mpcalc
 import numpy as np
-from metpy.units import units
-import xarray as xr
 
 from d02_processing.variables import ExtractVariables
 

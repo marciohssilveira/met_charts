@@ -46,3 +46,4 @@ zipp==3.4.0
 # # installed, uninstall it by: pip3 uninstall shapely
 # pip3 install shapely --no-binary shapely
 # pip install cartopy
+Cartopy~=0.18.0

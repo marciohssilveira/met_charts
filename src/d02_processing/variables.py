@@ -10,16 +10,16 @@ class ExtractVariables:
         self.data = data
         self.time_step = time_step
 
-    # def coordinates(self):
-    #     """
-    #     Extracts the lon-lat 2d meshgrid of the data for future plotting usage
-    #     """
-    #     # Extract lon and lat grid data values
-    #     lon = self.data['lon'].values
-    #     lat = self.data['lat'].values
-    #     # create a meshgrid for future plotting
-    #     lon_2d, lat_2d = np.meshgrid(lon, lat)
-    #     return lon_2d, lat_2d
+    def coordinates(self):
+        """
+        Extracts the lon-lat 2d meshgrid of the data for future plotting usage
+        """
+        # Extract lon and lat grid data values
+        lon = self.data['lon'].values
+        lat = self.data['lat'].values
+        # create a meshgrid for future plotting
+        lon_2d, lat_2d = np.meshgrid(lon, lat)
+        return lon_2d, lat_2d
 
     def temperature(self, level):
         """
@@ -195,19 +195,6 @@ class ExtractVariables:
         div = mpcalc.divergence(uwnd, vwnd, dx, dy)
         return np.array(div * 100000)
 
-
-def point(raw_data, data, lat, lon):
-    index_lat = np.where(raw_data['lat'] == round(lat * 4)/4)[0][0]
-    index_lon = np.where(raw_data['lon'] - 360 == round(lon * 4)/4)[0][0]
-    return np.array(data)[index_lat][index_lon]
-
-def vertical_profile():
-    vertical_profile = {}
-    levels = list(data.isobaric.values / 100)
-    for level in levels:
-        vertical_profile[level] = point(data, tair(level), lat=lat, lon=lon)
-
-vertical_profile
 
 if __name__ == "__main__":
     pass

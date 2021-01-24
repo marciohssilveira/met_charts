@@ -2,12 +2,8 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
-import metpy.calc as mpcalc
 import numpy as np
 import pandas as pd
-from datetime import datetime
-from metpy.units import units
-from metpy.plots import SkewT
 
 
 from d02_processing.indices import CalculateIndices
@@ -18,9 +14,9 @@ class CalculateCharts:
     def __init__(self, data, time_step):
         self.data = data
         self.time_step = time_step
-        self.output_path = 'data/02_img_output'
+        self.output_path = 'images/charts'
 
-        # Getting a time stamp to be used in the charts
+        # Getting a time stamp to be used in the images
         date = pd.to_datetime(np.datetime_as_string(
             data[list(dict(self.data.dims).keys())[-1]][self.time_step].values, unit='h', timezone='UTC'))
         self.time_stamp = f'{date.day:02d}-{date.month:02d}-{date.year} {date.hour:02d}UTC'
