@@ -29,4 +29,4 @@ The method ```get()``` inside the class ```GetGFSData``` in [data.py](https://gi
       
 ![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/instabilidade_00.jpg)
 
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/soundings/area_1/sounding_SBBR_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/soundings/area_1/SBBR/sounding_SBBR_00.jpg)
