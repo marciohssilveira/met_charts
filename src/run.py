@@ -28,6 +28,8 @@ start_time = time.time()
 
 print('Plotting images')
 for time_step in range(len(data[list(dict(data.dims).keys())[-1]])):
+    sounding = Sounding(data, time_step)
+    sounding.plot_skewt()
     charts = CalculateCharts(data, time_step)
     charts.clouds_humidity()
     charts.showers_heat_humidity()
@@ -36,8 +38,6 @@ for time_step in range(len(data[list(dict(data.dims).keys())[-1]])):
     charts.storms()
     charts.hail()
     charts.instability()
-    sounding = Sounding(data, time_step)
-    sounding.plot_skewt()
 
 elapsed_time = time.time() - start_time
 print('Process done in {} seconds'.format(elapsed_time))

@@ -13,7 +13,7 @@ class Sounding:
     def __init__(self, data, time_step):
         self.data = data
         self.time_step = time_step
-        self.output_path = '/images/soundings'
+        self.output_path = 'images/soundings'
         date = pd.to_datetime(
             np.datetime_as_string(data[list(dict(self.data.dims).keys())[-1]][self.time_step].values, unit='h',
                                   timezone='UTC'))
