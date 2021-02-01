@@ -11,20 +11,22 @@ The method ```get()``` inside the class ```GetGFSData``` in [data.py](https://gi
 
 [charts.py](https://github.com/marciohssilveira/met_charts/blob/master/src/charts.py) perform the calculations; and
 
-[run.py](https://github.com/marciohssilveira/met_charts/blob/master/src/plot_charts.py) plot the charts and organizes them in the folder [/img](https://github.com/marciohssilveira/met_charts/tree/master/img).
+[run.py](https://github.com/marciohssilveira/met_charts/blob/master/src/plot_charts.py) plot the charts and organizes them in the folder [/images](https://github.com/marciohssilveira/met_charts/tree/master/img).
 
 ## Examples
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/umidade_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/umidade_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/pancadas_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/pancadas_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/chuva_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/chuva_00.jpg)
        
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/trovoadas_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/trovoadas_00.jpg)
     
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/tempestades_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/tempestades_00.jpg)
         
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/granizo_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/granizo_00.jpg)
       
-![svg](https://github.com/marciohssilveira/met_charts/blob/master/data/02_img_output/instabilidade_00.jpg)
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/charts/instabilidade_00.jpg)
+
+![svg](https://github.com/marciohssilveira/met_charts/blob/master/images/soundings/area_1/sounding_SBBR_00.jpg)
