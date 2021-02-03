@@ -25,8 +25,6 @@ class CalculateCharts:
         indices = CalculateIndices(self.data, self.time_step)
         variables = ExtractVariables(self.data, self.time_step)
 
-        print('Performing calculations')
-
         # Assign variables to the data creation functions on ExtractVariables class
         # Indices
         self.k_index = indices.k

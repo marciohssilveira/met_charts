@@ -63,7 +63,6 @@ class GetGFSData:
 
         ###########################################
         # We now request data from the server using this query.
-        print('Downloading the data...')
         start_time = time.time()
 
         raw_data = gfs_subset.get_data(query)
