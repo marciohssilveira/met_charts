@@ -1,6 +1,6 @@
 import warnings
 from d03_visualisation.charts import CalculateCharts
-from d03_visualisation.sounding import Sounding
+from d03_visualisation.soundings import Sounding
 from d01_data.data import GetGFSData
 import xarray as xr
 import time
@@ -15,7 +15,8 @@ delta = datetime.datetime.fromtimestamp(os.path.getmtime(PATH)) - datetime.datet
 
 start_time = time.time()
 print('Checking data...')
-if delta > datetime.timedelta(1):
+# if not os.path.exists(PATH):
+if delta > datetime.timedelta(0.5):
     print('Downloading new data...')
     gfs = GetGFSData()  # instantiate the class containing the functions to download data
     data = gfs.get(n_hours=34)  # fetch data
