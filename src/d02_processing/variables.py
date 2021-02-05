@@ -1,8 +1,5 @@
-from types import LambdaType
 import metpy.calc as mpcalc
 import numpy as np
-from metpy.units import units
-import xarray as xr
 
 
 class ExtractVariables:
